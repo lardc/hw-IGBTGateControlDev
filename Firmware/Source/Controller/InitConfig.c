@@ -17,8 +17,10 @@ void INITCFG_ConfigDAC()
 	DACx_Clk_Enable(DAC_1_ClkEN);
 	DACx_Reset();
 	DAC_TriggerConfigCh1(DAC1, TRIG1_TIMER6, TRIG1_ENABLE);
-	DAC_BufferCh1(DAC1, false);
+	DAC_BufferCh1(DAC1, true);
 	DAC_EnableCh1(DAC1);
+	DAC_BufferCh2(DAC1, false);
+	DAC_EnableCh2(DAC1);
 }
 //------------------------------------------------
 
@@ -29,38 +31,28 @@ void INITCFG_ConfigIO()
 	RCC_GPIO_Clk_EN(PORTB);
 	
 	// Выходы
-	GPIO_InitPushPullOutput(GPIO_FAN);
-	GPIO_InitPushPullOutput(GPIO_PS_CTRL);
-	GPIO_InitPushPullOutput(GPIO_IFB_R0);
-	GPIO_InitPushPullOutput(GPIO_IFB_R1);
+	GPIO_InitPushPullOutput(GPIO_EXT_DAC_CS);
+	GPIO_InitPushPullOutput(GPIO_EXT_DAC_LDAC);
+	GPIO_InitPushPullOutput(GPIO_EXT_DAC_DATA);
+	GPIO_InitPushPullOutput(GPIO_EXT_DAC_CLK);
 	GPIO_InitPushPullOutput(GPIO_LED);
+	GPIO_InitPushPullOutput(GPIO_I_START);
 
 	// Выходы OpenDrain
-	GPIO_InitOpenDrainOutput(GPIO_SYNC_CTRL, NoPull);
+	GPIO_InitOpenDrainOutput(GPIO_SHORT_OUT, NoPull);
 
 	// Начальная установка состояний выводов
-	GPIO_SetState(GPIO_FAN, false);
-	GPIO_SetState(GPIO_PS_CTRL, false);
-	GPIO_SetState(GPIO_SYNC_CTRL, true);
-	GPIO_SetState(GPIO_IFB_R0, false);
-	GPIO_SetState(GPIO_IFB_R1, false);
+	GPIO_SetState(GPIO_EXT_DAC_CS, false);
+	GPIO_SetState(GPIO_EXT_DAC_LDAC, false);
+	GPIO_SetState(GPIO_EXT_DAC_DATA, true);
+	GPIO_SetState(GPIO_EXT_DAC_CLK, false);
+	GPIO_SetState(GPIO_I_START, true);
 	GPIO_SetState(GPIO_LED, false);
+	GPIO_SetState(GPIO_SHORT_OUT, false);
 
 	// Альтернативные функции
-	GPIO_InitAltFunction(GPIO_ALT_CAN_RX, AltFn_9);
-	GPIO_InitAltFunction(GPIO_ALT_CAN_TX, AltFn_9);
 	GPIO_InitAltFunction(GPIO_ALT_UART1_RX, AltFn_7);
 	GPIO_InitAltFunction(GPIO_ALT_UART1_TX, AltFn_7);
-}
-
-//------------------------------------------------
-void INITCFG_ConfigCAN()
-{
-	RCC_CAN_Clk_EN(CAN_1_ClkEN);
-	NCAN_Init(SYSCLK, CAN_BAUDRATE, FALSE);
-	NCAN_FIFOInterrupt(TRUE);
-	NCAN_FilterInit(0, CAN_SLAVE_FILTER_ID, CAN_SLAVE_FILTER_ID);
-	NCAN_InterruptSetPriority(0);
 }
 //------------------------------------------------
 

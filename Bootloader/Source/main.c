@@ -11,7 +11,6 @@
 //
 void ConfigSysClk();
 void ConfigGPIO();
-void ConfigCAN();
 void ConfigUART();
 void ConfigTimer2();
 void ConfigWatchDog();
@@ -27,7 +26,6 @@ int main()
 	// Init peripherals
 	ConfigSysClk();
 	ConfigGPIO();
-	ConfigCAN();
 	ConfigUART();
 	ConfigTimer2();
 	ConfigWatchDog();
@@ -57,8 +55,26 @@ void ConfigGPIO()
 	
 	//Выходы
 	GPIO_Config(LED_BLINK_PORT, LED_BLINK_PIN, Output, PushPull, HighSpeed, NoPull);
-	GPIO_Config(DAC_PORT, DAC_PIN, Output, PushPull, HighSpeed, NoPull);
-	GPIO_Bit_Rst(DAC_PORT, DAC_PIN);
+	//
+	GPIO_Config(EXT_DAC_PORT, EXT_DAC_CS, Output, PushPull, HighSpeed, NoPull);
+	GPIO_Bit_Rst(EXT_DAC_PORT, EXT_DAC_CS);
+	GPIO_Config(EXT_DAC_PORT, EXT_DAC_LDAC, Output, PushPull, HighSpeed, NoPull);
+	GPIO_Bit_Rst(EXT_DAC_PORT, EXT_DAC_LDAC);
+	GPIO_Config(EXT_DAC_PORT, EXT_DAC_DATA, Output, PushPull, HighSpeed, NoPull);
+	GPIO_Bit_Rst(EXT_DAC_PORT, EXT_DAC_DATA);
+	GPIO_Config(EXT_DAC_PORT, EXT_DAC_CLK, Output, PushPull, HighSpeed, NoPull);
+	GPIO_Bit_Rst(EXT_DAC_PORT, EXT_DAC_CLK);
+	//
+	GPIO_Config(A_SET_PORT, A_SET_I, Output, PushPull, HighSpeed, NoPull);
+	GPIO_Bit_Rst(A_SET_PORT, A_SET_I);
+	GPIO_Config(A_SET_PORT, A_SET_U, Output, PushPull, HighSpeed, NoPull);
+	GPIO_Bit_Rst(A_SET_PORT, A_SET_U);
+	//
+	GPIO_Config(SHORT_OUT_PORT, SHORT_OUT_PIN, Output, PushPull, HighSpeed, NoPull);
+	GPIO_Bit_Rst(SHORT_OUT_PORT, SHORT_OUT_PIN);
+	//
+	GPIO_Config(I_START_PORT, I_START_PIN, Output, PushPull, HighSpeed, NoPull);
+	GPIO_Bit_Set(I_START_PORT, I_START_PIN);
 	
 	//Альтернативные функции портов
 	GPIO_Config(GPIOA, Pin_9, AltFn, PushPull, HighSpeed, NoPull); //PA9(USART1 TX)
@@ -67,21 +83,6 @@ void ConfigGPIO()
 	GPIO_Config(GPIOA, Pin_10, AltFn, PushPull, HighSpeed, NoPull); //PA10(USART1 RX)
 	GPIO_AltFn(GPIOA, Pin_10, AltFn_7);
 	
-	GPIO_Config(GPIOA, Pin_11, AltFn, PushPull, HighSpeed, NoPull); //PA11(CAN RX)
-	GPIO_AltFn(GPIOA, Pin_11, AltFn_9);
-	
-	GPIO_Config(GPIOA, Pin_12, AltFn, PushPull, HighSpeed, NoPull); //PA12(CAN TX)
-	GPIO_AltFn(GPIOA, Pin_12, AltFn_9);
-	
-}
-//--------------------------------------------
-
-void ConfigCAN()
-{
-	RCC_CAN_Clk_EN(CAN_1_ClkEN);
-	NCAN_Init(SYSCLK, CAN_BAUDRATE, FALSE);
-	NCAN_FIFOInterrupt(TRUE);
-	NCAN_FilterInit(0, CAN_SLAVE_FILTER_ID, CAN_MASTER_FILTER_ID);
 }
 //--------------------------------------------
 
