@@ -13,48 +13,33 @@ void LL_ToggleBoardLED()
 }
 //-----------------------------
 
-void LL_LSLCurrentBoardLock(bool State)
+void LL_VShortOut(bool State)
 {
-	GPIO_SetState(GPIO_SYNC_CTRL, State);
+	GPIO_SetState(GPIO_SHORT_OUT, State);
 }
 //-----------------------------
 
-void LL_Fan(bool State)
+void LL_IStart(bool State)
 {
-	GPIO_SetState(GPIO_FAN, State);
+	GPIO_SetState(GPIO_I_START, State);
 }
 //-----------------------------
 
-void LL_PowerSupplyEnable(bool State)
+void LL_ICompState()
 {
-	GPIO_SetState(GPIO_PS_CTRL, State);
+	GPIO_GetState(GPIO_I_COMP);
 }
 //-----------------------------
 
-void LL_SetCurrentRange0()
-{
-	GPIO_SetState(GPIO_IFB_R0, false);
-	GPIO_SetState(GPIO_IFB_R1, false);
-}
-//-----------------------------
-
-void LL_SetCurrentRange1()
-{
-	GPIO_SetState(GPIO_IFB_R0, true);
-	GPIO_SetState(GPIO_IFB_R1, false);
-}
-//-----------------------------
-
-void LL_SetCurrentRange2()
-{
-	GPIO_SetState(GPIO_IFB_R0, false);
-	GPIO_SetState(GPIO_IFB_R1, true);
-}
-//-----------------------------
-
-void LL_WriteDAC(Int16U Data)
+void LL_ISetDAC(Int16U Data)
 {
 	DAC_SetValueCh1(DAC1, Data);
+}
+//-----------------------------
+
+void LL_USetDAC(Int16U Data)
+{
+	DAC_SetValueCh2(DAC1, Data);
 }
 //-----------------------------
 

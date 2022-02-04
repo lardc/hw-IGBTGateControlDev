@@ -104,53 +104,36 @@ void INITCFG_ConfigADC()
 	// ADC1
 	ADC_Calibration(ADC1);
 	ADC_SoftTrigConfig(ADC1);
-	ADC_ChannelSeqReset(ADC1);
-
-	for (uint8_t i = 1; i <= ADC_DMA_BUFF_SIZE; ++i)
-		ADC_ChannelSet_Sequence(ADC1, ADC1_V_BAT_CHANNEL, i);
-
-	ADC_ChannelSeqLen(ADC1, ADC_DMA_BUFF_SIZE);
 	ADC_DMAConfig(ADC1);
 	ADC_Enable(ADC1);
+	ADC_DMAEnable(ADC1, false);
 
 	// ADC3
 	ADC_Calibration(ADC3);
 	ADC_SoftTrigConfig(ADC3);
-	ADC_ChannelSeqReset(ADC3);
-
-	for (uint8_t i = 1; i <= ADC_DMA_BUFF_SIZE; ++i)
-		ADC_ChannelSet_Sequence(ADC3, ADC3_CURRENT_CHANNEL, i);
-
-	ADC_ChannelSeqLen(ADC3, ADC_DMA_BUFF_SIZE);
 	ADC_DMAConfig(ADC3);
 	ADC_Enable(ADC3);
+	ADC_DMAEnable(ADC3, false);
 }
 //------------------------------------------------
 
 void INITCFG_ConfigDMA()
 {
 	DMA_Clk_Enable(DMA1_ClkEN);
-	DMA_Clk_Enable(DMA2_ClkEN);
-
+	/*
 	// DMA для АЦП напряжения батареи
 	DMA_Reset(DMA_ADC_V_BAT_CHANNEL);
 	DMAChannelX_Config(DMA_ADC_V_BAT_CHANNEL, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_16BIT, DMA_PSIZE_16BIT,
 							DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_EN, DMA_READ_FROM_PERIPH);
 	DMAChannelX_DataConfig(DMA_ADC_V_BAT_CHANNEL, (uint32_t)(&MEASURE_ADC_BatteryVoltageRaw[0]), (uint32_t)(&ADC1->DR), ADC_DMA_BUFF_SIZE);
-	DMA_ChannelEnable(DMA_ADC_V_BAT_CHANNEL, true);
+	DMA_ChannelEnable(DMA_ADC_V_BAT_CHANNEL, true);*/
 
-	// DMA для АЦП тока
-	DMA_Reset(DMA_ADC_CURRENT_CHANNEL);
-	DMAChannelX_Config(DMA_ADC_CURRENT_CHANNEL, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_16BIT, DMA_PSIZE_16BIT,
-							DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_EN, DMA_READ_FROM_PERIPH);
-	DMAChannelX_DataConfig(DMA_ADC_CURRENT_CHANNEL, (uint32_t)(&MEASURE_ADC_CurrentRaw[0]), (uint32_t)(&ADC3->DR), ADC_DMA_BUFF_SIZE);
-	DMA_ChannelEnable(DMA_ADC_CURRENT_CHANNEL, true);
 }
 //------------------------------------------------
 
 void INITCFG_ConfigExtInterrupt()
 {
-	EXTI_Config(EXTI_PB, EXTI_4, FALL_TRIG, 0);
-	EXTI_EnableInterrupt(EXTI4_IRQn, 0, true);
+	EXTI_Config(EXTI_PA, EXTI_15, BOTH_TRIG, 1);
+	EXTI_EnableInterrupt(EXTI15_IRQn, 0, true);
 }
 //------------------------------------------------

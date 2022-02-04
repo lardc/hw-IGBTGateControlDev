@@ -18,82 +18,24 @@ void MEASURE_StartNewSampling();
 
 // Functions
 //
-float MEASURE_SingleSampleBatteryVoltage()
-{
-	DMA_TransferCompleteReset(DMA1, DMA_TRANSFER_COMPLETE);
-	ADC_SamplingStart(ADC1);
-	while(!DMA_IsTransferComplete(DMA1, DMA_TRANSFER_COMPLETE)){}
 
-	return CU_ADCtoV(MEASURE_DMAExtractVolatge());
+float MEASURE_UUSen()
+{
+	float result = ((float)ADC_Measure(ADC3, 1));
+	return (result > 0) ? result : 0;
 }
 //-----------------------------------------------
 
-void MEASURE_SampleParams(volatile RegulatorParamsStruct* Regulator)
+float MEASURE_UISen()
 {
-	Regulator->MeasuredCurrent = CU_ADCtoI(MEASURE_DMAExtractCurrent(), Regulator->CurrentRange);
-	Regulator->MeasuredBatteryVoltage = CU_ADCtoV(MEASURE_DMAExtractVolatge());
-	MEASURE_StartNewSampling();
+	float result = ((float)ADC_Measure(ADC1, 1));
+	return (result > 0) ? result : 0;
 }
 //-----------------------------------------------
 
-Int16U MEASURE_DMAExtractX(Int16U* InputArray, Int16U ArraySize)
+float MEASURE_IIGate()
 {
-	Int32U AverageData = 0;
-
-	for(int i = 0; i < ArraySize; i++)
-		AverageData += *(InputArray + i);
-
-	return (Int16U)((float)AverageData / ArraySize);
+	float result = ((float)ADC_Measure(ADC1, 4));
+	return (result > 0) ? result : 0;
 }
 //-----------------------------------------------
-
-Int16U MEASURE_DMAExtractCurrent()
-{
-	return MEASURE_DMAExtractX(&MEASURE_ADC_CurrentRaw[1], ADC_DMA_BUFF_SIZE - 1);
-}
-//-----------------------------------------------
-
-Int16U MEASURE_DMAExtractVolatge()
-{
-	return MEASURE_DMAExtractX(&MEASURE_ADC_BatteryVoltageRaw[1], ADC_DMA_BUFF_SIZE - 1);
-}
-//-----------------------------------------------
-
-void MEASURE_DMABufferClear()
-{
-	for(int i = 0; i < ADC_DMA_BUFF_SIZE; i++)
-		MEASURE_ADC_CurrentRaw[i] = 0;
-}
-//-----------------------------------------------
-
-void MEASURE_StartNewSampling()
-{
-	DMA_TransferCompleteReset(DMA1, DMA_TRANSFER_COMPLETE);
-	DMA_TransferCompleteReset(DMA2, DMA_TRANSFER_COMPLETE);
-	ADC_SamplingStart(ADC1);
-	ADC_SamplingStart(ADC3);
-}
-//-----------------------------------------------
-
-void MEASURE_SetCurrentRange(volatile RegulatorParamsStruct* Regulator)
-{
-	if((Regulator->CurrentTarget * 10) <= DataTable[REG_CURRENT_THRESHOLD_RANGE0])
-	{
-		Regulator->CurrentRange = CURRENT_RANGE_0;
-		LL_SetCurrentRange0();
-	}
-	else if((Regulator->CurrentTarget * 10) <= DataTable[REG_CURRENT_THRESHOLD_RANGE1])
-	{
-		Regulator->CurrentRange = CURRENT_RANGE_1;
-		LL_SetCurrentRange1();
-	}
-	else
-	{
-		Regulator->CurrentRange = CURRENT_RANGE_2;
-		LL_SetCurrentRange2();
-	}
-
-}
-//-----------------------------------------------
-
-

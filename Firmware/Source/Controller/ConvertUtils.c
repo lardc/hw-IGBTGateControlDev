@@ -64,18 +64,16 @@ void CU_LoadConvertParams()
 	AdcToVoltageParams.B = (Int16S)DataTable[REG_ADC_VOLTAGE_B];
 
 	// Параметры преобразования значения АЦП в ток и тока в ЦАП
-	for(int i = 0; i < CURRENT_RANGE_QUANTITY; i++)
-	{
-		AdcToCurrentParams[i].P2 = (float)((Int16S)DataTable[REG_ADC_I_RANGE0_P2 + i * 6]) / 1e6;
-		AdcToCurrentParams[i].P1 = (float)DataTable[REG_ADC_I_RANGE0_P1 + i * 6] / 1000;
-		AdcToCurrentParams[i].P0 = (float)((Int16S)DataTable[REG_ADC_I_RANGE0_P0 + i * 6]) / 10;
-		AdcToCurrentParams[i].K = (float)DataTable[REG_ADC_I_RANGE0_N + i * 6] / DataTable[REG_ADC_I_RANGE0_D + i * 6];
-		AdcToCurrentParams[i].B = (Int16S)DataTable[REG_ADC_I_RANGE0_B + i * 6];
-		AdcToCurrentParams[i].Kamp = (float)DataTable[REG_K_AMP_RANGE0 + i] / 100;
 
-		CurrentToDacParams[i].K = (float)DataTable[REG_I_TO_DAC_RANGE0_K + i * 2] / 1000;
-		CurrentToDacParams[i].B = (Int16S)DataTable[REG_I_TO_DAC_RANGE0_B + i * 2];
-	}
+	AdcToCurrentParams.P2 = (float)((Int16S)DataTable[REG_ADC_I_RANGE0_P2 + i * 6]) / 1e6;
+	AdcToCurrentParams.P1 = (float)DataTable[REG_ADC_I_RANGE0_P1 + i * 6] / 1000;
+	AdcToCurrentParams.P0 = (float)((Int16S)DataTable[REG_ADC_I_RANGE0_P0 + i * 6]) / 10;
+	AdcToCurrentParams.K = (float)DataTable[REG_ADC_I_RANGE0_N + i * 6] / DataTable[REG_ADC_I_RANGE0_D + i * 6];
+	AdcToCurrentParams.B = (Int16S)DataTable[REG_ADC_I_RANGE0_B + i * 6];
+	AdcToCurrentParams.Kamp = (float)DataTable[REG_K_AMP_RANGE0 + i] / 100;
+
+	CurrentToDacParams[i].K = (float)DataTable[REG_I_TO_DAC_RANGE0_K + i * 2] / 1000;
+	CurrentToDacParams[i].B = (Int16S)DataTable[REG_I_TO_DAC_RANGE0_B + i * 2];
 }
 //-----------------------------
 
