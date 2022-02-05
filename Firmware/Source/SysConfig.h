@@ -34,7 +34,11 @@
 #define ADC1_I_SEN_CHANNEL				1				// АЦП1 номер канала тока (источник V)
 #define ADC1_I_GATE_CHANNEL				4				// АЦП1 номер канала тока (источник I)
 #define ADC3_U_SEN_CHANNEL				1				// АЦП3 номер канала напряжения (источник V)
-#define ADC_DMA_BUFF_SIZE				5				// Количество данных для DMA
+// ----------------------------------------------
+
+// SPI
+#define SPI1_BAUDRATE_BITS				0x1				// Биты задания битрейта SPI
+#define SPI1_LSB_FIRST					false			// Передача младшим битов вперед
 // ----------------------------------------------
 
 #endif // __SYSCONFIG_H

@@ -14,7 +14,7 @@ Int16U REGULATOR_DACApplyLimits(float Value, Int16U Offset, Int16U LimitValue);
 //
 bool REGULATOR_Process(volatile RegulatorParamsStruct* Regulator)
 {
-	static float Qi = 0, Qp;
+	/*static float Qi = 0, Qp;
 
 	Regulator->RegulatorError = (Regulator->RegulatorPulseCounter == 0) ? 0 : (Regulator->CurrentTable[Regulator->RegulatorPulseCounter] - Regulator->MeasuredCurrent);
 
@@ -49,7 +49,7 @@ bool REGULATOR_Process(volatile RegulatorParamsStruct* Regulator)
 		Qi = 0;
 		return true;
 	}
-	else
+	else*/
 		return false;
 }
 //-----------------------------------------------
@@ -68,7 +68,7 @@ Int16U REGULATOR_DACApplyLimits(float Value, Int16U Offset, Int16U LimitValue)
 
 void REGULATOR_LoggingData(volatile RegulatorParamsStruct* Regulator)
 {
-	static Int16U ScopeLogStep = 0, LocalCounter = 0;
+	/*static Int16U ScopeLogStep = 0, LocalCounter = 0;
 
 	// Сброс локального счетчика в начале логгирования
 	if (CONTROL_Values_Counter == 0)
@@ -95,13 +95,13 @@ void REGULATOR_LoggingData(volatile RegulatorParamsStruct* Regulator)
 
 	// Сброс локального счетчика
 	if (LocalCounter >= VALUES_x_SIZE)
-		LocalCounter = 0;
+		LocalCounter = 0;*/
 }
 //-----------------------------------------------
 
 void REGULATOR_CashVariables(volatile RegulatorParamsStruct* Regulator)
 {
-	float CurrentMax = (float)DataTable[REG_CURRENT_PER_CURBOARD] / 10 * DataTable[REG_CURBOARD_QUANTITY];
+	/*float CurrentMax = (float)DataTable[REG_CURRENT_PER_CURBOARD] / 10 * DataTable[REG_CURBOARD_QUANTITY];
 	float CurrentTarget = (float)DataTable[REG_CURRENT_PULSE_VALUE] / 10;
 
 	// Кеширование коэффициентов регулятора
@@ -115,6 +115,6 @@ void REGULATOR_CashVariables(volatile RegulatorParamsStruct* Regulator)
 	Regulator->DebugMode = false;
 	Regulator->DACOffset = DataTable[REG_DAC_OFFSET];
 	Regulator->DACLimitValue = (DAC_MAX_VAL > DataTable[REG_DAC_OUTPUT_LIMIT_VALUE]) ? \
-			DataTable[REG_DAC_OUTPUT_LIMIT_VALUE] : DAC_MAX_VAL;
+			DataTable[REG_DAC_OUTPUT_LIMIT_VALUE] : DAC_MAX_VAL;*/
 }
 //-----------------------------------------------

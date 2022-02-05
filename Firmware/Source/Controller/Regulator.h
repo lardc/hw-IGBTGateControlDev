@@ -15,7 +15,7 @@
 //
 typedef struct __RegulatorParams
 {
-	Int16U CurrentRange;
+	/*Int16U CurrentRange;
 	float CurrentTarget;
 	float MeasuredCurrent;
 	float MeasuredBatteryVoltage;
@@ -29,7 +29,7 @@ typedef struct __RegulatorParams
 	float RegulatorOutput;
 	Int16U DACOffset;
 	Int16U DACLimitValue;
-	Int16U DACSetpoint;
+	Int16U DACSetpoint;*/
 }RegulatorParamsStruct;
 
 // Functions

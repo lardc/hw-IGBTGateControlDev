@@ -15,9 +15,11 @@
 
 #define PI										3.1416f	// Значение числа Пи
 #define DAC_MAX_VAL								0x0FFF	// Максимальное значение ЦАП
+#define EXT_DAC_A								0x0		// Выбор канала A
+#define EXT_DAC_B								0x8000	// Выбор канала B
 
 // Размер массивов EP
-#define VALUES_x_SIZE	((CURRENT_PULSE_WIDTH + CURRENT_PULSE_TAIL) / TIMER15_uS)
+//#define VALUES_x_SIZE	((CURRENT_PULSE_WIDTH + CURRENT_PULSE_TAIL) / TIMER15_uS)
 
 // Временные параметры
 #define TIME_LED_BLINK							500		// Мигание светодиодом (в мс)

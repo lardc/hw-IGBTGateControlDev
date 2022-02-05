@@ -10,7 +10,7 @@
 // Functions
 bool DIAG_HandleDiagnosticAction(uint16_t ActionID, uint16_t *pUserError)
 {
-	switch (ActionID)
+	/*switch (ActionID)
 	{
 		case ACT_DBG_POWER_SUPPLY_CTRL:
 			{
@@ -50,7 +50,7 @@ bool DIAG_HandleDiagnosticAction(uint16_t ActionID, uint16_t *pUserError)
 
 		default:
 			return false;
-	}
+	}*/
 
 	return true;
 }

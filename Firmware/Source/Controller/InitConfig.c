@@ -33,8 +33,6 @@ void INITCFG_ConfigIO()
 	// Выходы
 	GPIO_InitPushPullOutput(GPIO_EXT_DAC_CS);
 	GPIO_InitPushPullOutput(GPIO_EXT_DAC_LDAC);
-	GPIO_InitPushPullOutput(GPIO_EXT_DAC_DATA);
-	GPIO_InitPushPullOutput(GPIO_EXT_DAC_CLK);
 	GPIO_InitPushPullOutput(GPIO_LED);
 	GPIO_InitPushPullOutput(GPIO_I_START);
 
@@ -42,10 +40,8 @@ void INITCFG_ConfigIO()
 	GPIO_InitOpenDrainOutput(GPIO_SHORT_OUT, NoPull);
 
 	// Начальная установка состояний выводов
-	GPIO_SetState(GPIO_EXT_DAC_CS, false);
-	GPIO_SetState(GPIO_EXT_DAC_LDAC, false);
-	GPIO_SetState(GPIO_EXT_DAC_DATA, true);
-	GPIO_SetState(GPIO_EXT_DAC_CLK, false);
+	GPIO_SetState(GPIO_EXT_DAC_CS, true);
+	GPIO_SetState(GPIO_EXT_DAC_LDAC, true);
 	GPIO_SetState(GPIO_I_START, true);
 	GPIO_SetState(GPIO_LED, false);
 	GPIO_SetState(GPIO_SHORT_OUT, false);
@@ -53,6 +49,7 @@ void INITCFG_ConfigIO()
 	// Альтернативные функции
 	GPIO_InitAltFunction(GPIO_ALT_UART1_RX, AltFn_7);
 	GPIO_InitAltFunction(GPIO_ALT_UART1_TX, AltFn_7);
+	GPIO_InitAltFunction(GPIO_ALT_SPI1_CLK, AltFn_5);
 }
 //------------------------------------------------
 
@@ -134,6 +131,13 @@ void INITCFG_ConfigDMA()
 void INITCFG_ConfigExtInterrupt()
 {
 	EXTI_Config(EXTI_PA, EXTI_15, BOTH_TRIG, 1);
-	EXTI_EnableInterrupt(EXTI15_IRQn, 0, true);
+	EXTI_EnableInterrupt(EXTI15_10_IRQn, 0, true);
+}
+//------------------------------------------------
+
+void INITCFG_ConfigSPI()
+{
+	SPI_Init(SPI1, SPI1_BAUDRATE_BITS, SPI1_LSB_FIRST);
+	SPI_InvertClockPolarity(SPI1, true);
 }
 //------------------------------------------------

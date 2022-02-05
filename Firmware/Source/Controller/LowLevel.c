@@ -13,7 +13,7 @@ void LL_ToggleBoardLED()
 }
 //-----------------------------
 
-void LL_VShortOut(bool State)
+void LL_UShortOut(bool State)
 {
 	GPIO_SetState(GPIO_SHORT_OUT, State);
 }
@@ -31,15 +31,36 @@ void LL_ICompState()
 }
 //-----------------------------
 
-void LL_ISetDAC(Int16U Data)
+void LL_IISetDAC(Int16U Data)
 {
 	DAC_SetValueCh1(DAC1, Data);
 }
 //-----------------------------
 
-void LL_USetDAC(Int16U Data)
+void LL_UUSetDAC(Int16U Data)
 {
 	DAC_SetValueCh2(DAC1, Data);
 }
 //-----------------------------
 
+void LL_ExtDACSync(bool State)
+{
+	GPIO_SetState(GPIO_EXT_DAC_CS, State);
+}
+//-----------------------------
+
+void LL_ExtDACLDAC(bool State)
+{
+	GPIO_SetState(GPIO_EXT_DAC_LDAC, State);
+}
+//-----------------------------
+
+void LL_ExtDACSendData(Int16U Data)
+{
+	LL_ExtDACSync(false);
+	SPI_WriteByte(SPI1, Data);
+	LL_ExtDACLDAC(false);
+	LL_ExtDACSync(true);
+	LL_ExtDACLDAC(true);
+}
+//-----------------------------

@@ -1,45 +1,26 @@
 ﻿// Header
-#include "LowLevel.h"
+#include "ExternalDAC.h"
 // Include
 #include "Board.h"
-#include "Delay.h"
+#include "LowLevel.h"
+#include "ConvertUtils.h"
 #include "Global.h"
 
 // Functions
 //
-void LL_ToggleBoardLED()
+
+void ExDAC_IUCutoff(float Value)
 {
-	GPIO_Toggle(GPIO_LED);
+	Int16U Data = CU_UCutoffToExtDAC(Value);
+	Data |= EXT_DAC_A;
+	LL_ExtDACSendData(Data);
 }
 //-----------------------------
 
-void LL_VShortOut(bool State)
+void ExDAC_IUNegative(float Value)
 {
-	GPIO_SetState(GPIO_SHORT_OUT, State);
+	Int16U Data = CU_UNegativeToExtDAC(Value);
+	Data |= EXT_DAC_B;
+	LL_ExtDACSendData(Data);
 }
 //-----------------------------
-
-void LL_IStart(bool State)
-{
-	GPIO_SetState(GPIO_I_START, State);
-}
-//-----------------------------
-
-void LL_ICompState()
-{
-	GPIO_GetState(GPIO_I_COMP);
-}
-//-----------------------------
-
-void LL_ISetDAC(Int16U Data)
-{
-	DAC_SetValueCh1(DAC1, Data);
-}
-//-----------------------------
-
-void LL_USetDAC(Int16U Data)
-{
-	DAC_SetValueCh2(DAC1, Data);
-}
-//-----------------------------
-

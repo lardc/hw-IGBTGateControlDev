@@ -8,12 +8,13 @@
 // Functions
 //
 void LL_ToggleBoardLED();
-void LL_LSLCurrentBoardLock(bool State);
-void LL_PowerSupplyEnable(bool State);
-void LL_SetCurrentRange0();
-void LL_SetCurrentRange1();
-void LL_SetCurrentRange2();
-void LL_Fan(bool State);
-void LL_WriteDAC(Int16U Data);
+void LL_UShortOut(bool State);
+void LL_IStart(bool State);
+void LL_ICompState();
+void LL_IISetDAC(Int16U Data);
+void LL_UUSetDAC(Int16U Data);
+void LL_ExtDACSync(bool State);
+void LL_ExtDACLDAC(bool State);
+void LL_ExtDACSendData(Int16U Data);
 
 #endif //__LOWLEVEL_H

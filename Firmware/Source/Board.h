@@ -12,6 +12,7 @@
 #include "ZwADC.h"
 #include "ZwEXTI.h"
 #include "ZwSCI.h"
+#include "ZwSPI.h"
 #include "ZwIWDG.h"
 #include "ZwNFLASH.h"
 
@@ -19,8 +20,6 @@
 // Определения для выходных портов
 GPIO_PortPinSettingMacro GPIO_EXT_DAC_CS		= {GPIOA, Pin_1};
 GPIO_PortPinSettingMacro GPIO_EXT_DAC_LDAC		= {GPIOA, Pin_2};
-GPIO_PortPinSettingMacro GPIO_EXT_DAC_DATA		= {GPIOA, Pin_7};
-GPIO_PortPinSettingMacro GPIO_EXT_DAC_CLK		= {GPIOA, Pin_8};
 //
 GPIO_PortPinSettingMacro GPIO_LED				= {GPIOB, Pin_7};
 GPIO_PortPinSettingMacro GPIO_SHORT_OUT			= {GPIOB, Pin_6};
@@ -32,5 +31,6 @@ GPIO_PortPinSettingMacro GPIO_I_COMP			= {GPIOA, Pin_15};
 // Определения для портов альтернативных функций
 GPIO_PortPinSettingMacro GPIO_ALT_UART1_TX		= {GPIOA, Pin_9};
 GPIO_PortPinSettingMacro GPIO_ALT_UART1_RX		= {GPIOA, Pin_10};
+GPIO_PortPinSettingMacro GPIO_ALT_SPI1_CLK		= {GPIOB, Pin_3};
 
 #endif // __BOARD_H

@@ -17,46 +17,56 @@ typedef struct __ConvertParams
 }ConvertParams;
 
 // Variables
-ConvertParams AdcToVoltageParams;
-ConvertParams AdcToCurrentParams[CURRENT_RANGE_QUANTITY];
-ConvertParams CurrentToDacParams[CURRENT_RANGE_QUANTITY];
+
 
 // Functions prototypes
 float CU_ADCtoX(Int16U Data, ConvertParams* Coefficients);
 
 // Functions
 //
-float CU_ItoDAC(float Current, Int16U CurrentRange)
+Int16U CU_UCutoffToExtDAC(float Value)
 {
-	// Пересчет амплитуды тока в расчете на одну CurrentBoard
-	Current = Current / DataTable[REG_CURBOARD_QUANTITY];
-	return (Current + CurrentToDacParams[CurrentRange].B) * CurrentToDacParams[CurrentRange].K;
+	return (Int16U)(Value * (float)DataTable[REG_EXT_DAC_CUTOFF_K] / 1e6);
 }
 //-----------------------------
 
-float CU_ADCtoX(Int16U Data, ConvertParams* Coefficients)
+Int16U CU_UNegativeToExtDAC(float Value)
 {
-	return (Data * Coefficients->K + Coefficients->B);
+	return (Int16U)(Value * (float)DataTable[REG_EXT_DAC_NEGATIVE_K] / 1e6);
 }
 //-----------------------------
 
-float CU_ADCtoI(Int16U Data, Int16U CurrentRange)
+Int16U CU_UToDAC(float Value)
 {
-	float Uadc, Current;
-
-	Uadc = CU_ADCtoX(Data, &AdcToCurrentParams[CurrentRange]);
-	Current = Uadc / AdcToCurrentParams[CurrentRange].Kamp / DataTable[REG_SHUNT_RESISTANCE] * 1000;
-
-	return (Current * Current * AdcToCurrentParams[CurrentRange].P2 + Current * AdcToCurrentParams[CurrentRange].P1 + AdcToCurrentParams[CurrentRange].P0);
+	return (Int16U)(Value * (float)DataTable[REG_DAC_U_K] / 1e6);
 }
 //-----------------------------
 
-float CU_ADCtoV(Int16U Data)
+Int16U CU_IToDAC(float Value)
 {
-	return CU_ADCtoX(Data, &AdcToVoltageParams);
+	return (Int16U)(Value * (float)DataTable[REG_DAC_I_K] / 1e6);
 }
 //-----------------------------
 
+float CU_UADCUToX(Int16U Data)
+{
+	return (float)(Data * (float)DataTable[REG_ADC_U_SEN_K] / 1e6);
+}
+//-----------------------------
+
+float CU_UADCIToX(Int16U Data)
+{
+	return (float)(Data * (float)DataTable[REG_ADC_I_SEN_K] / 1e6);
+}
+//-----------------------------
+
+float CU_IADCIToX(Int16U Data)
+{
+	return (float)(Data * (float)DataTable[REG_ADC_I_GATE_K] / 1e6);
+}
+//-----------------------------
+
+/*
 void CU_LoadConvertParams()
 {
 	// Параметры преобразования значения АЦП в напряжение
@@ -74,6 +84,6 @@ void CU_LoadConvertParams()
 
 	CurrentToDacParams[i].K = (float)DataTable[REG_I_TO_DAC_RANGE0_K + i * 2] / 1000;
 	CurrentToDacParams[i].B = (Int16S)DataTable[REG_I_TO_DAC_RANGE0_B + i * 2];
-}
+}*/
 //-----------------------------
 
