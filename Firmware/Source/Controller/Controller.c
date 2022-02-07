@@ -159,7 +159,20 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 					*pUserError = ERR_OPERATION_BLOCKED;*/
 			break;
 
-		case ACT_SOFTWARE_START:
+		case ACT_U_START:
+			/*if (CONTROL_State == DS_ConfigReady)
+			{
+				CONTROL_SetDeviceState(DS_InProcess, SS_Pulse);
+				CONTROL_StartProcess();
+			}
+			else
+				if (CONTROL_State == DS_InProcess)
+					*pUserError = ERR_OPERATION_BLOCKED;
+				else
+					*pUserError = ERR_DEVICE_NOT_READY;*/
+			break;
+
+		case ACT_QG_START:
 			/*if (CONTROL_State == DS_ConfigReady)
 			{
 				CONTROL_SetDeviceState(DS_InProcess, SS_Pulse);

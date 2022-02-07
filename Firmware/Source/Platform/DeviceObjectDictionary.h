@@ -6,14 +6,20 @@
 #define ACT_DISABLE_POWER				2	// Выключение блока
 #define ACT_CLR_FAULT					3	// Очистка всех fault
 #define ACT_CLR_WARNING					4	// Очистка всех warning
-
-#define ACT_DBG_POWER_SUPPLY_CTRL		50	// Проверка работы SCRelayBoard
-#define ACT_DBG_PULSE					51	// Формирование управляющего импульса на затворах транзисторов
-#define ACT_DBG_SET_CURRENT_RANGE		52	// Установка диапазона по току (0, 1, 2)
-#define ACT_DBG_FAN_CTRL				53	// Проверка работы вентилятора
-
-#define ACT_CONFIG_UNIT					100	// Конфигурация блока
-#define ACT_SOFTWARE_START				101	// Старт измерения
+// Источник напряжения
+#define ACT_DBG_U_U_SET					50	// Установить значение напряжения затвора из регистра DBG [mV]
+#define ACT_DBG_U_SHORT					51	// Закоротить выход источника напряжения (регистр DBG = 1 -> закоротка, DBG = 0 -> разрыв)
+#define ACT_DBG_U_U_SEN					52	// Считать значение напряжения затвора в регистр DBG [mV]
+#define ACT_DBG_U_I_SEN					53	// Считать значение тока в цепи затвора в регистр DBG [uA]
+// Источник тока
+#define ACT_DBG_I_I_SET					60	// Установить значение тока затвора из регистра DBG [uA]
+#define ACT_DBG_I_START					61	// Подача тока на нагрузку (регистр DBG = 1 -> ток через нагрузку, DBG = 0 -> ток через внутренний транзистор)
+#define ACT_DBG_I_I_GATE				62	// Считать значение тока в цепи затвора в регистр DBG [uA]
+#define ACT_DBG_I_U_CUTOFF				63	// Установить значение напряжения отсечки из регистра DBG [mV]
+#define ACT_DBG_I_U_NEGATIVE			64	// Установить значение отрицательного напряжения смещения из регистра DBG [mV]
+//
+#define ACT_U_START						100	// Запуск формирования напряжения затвора
+#define ACT_QG_START					101	// Старт измерения заряда затвора
 #define ACT_STOP_PROCESS				102	// Стоп измерения
 
 #define ACT_SAVE_TO_ROM					200	// Сохранение пользовательских данных во FLASH процессора

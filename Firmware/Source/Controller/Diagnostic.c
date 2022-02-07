@@ -7,42 +7,89 @@
 #include "Controller.h"
 #include "DebugActions.h"
 
+
 // Functions
 bool DIAG_HandleDiagnosticAction(uint16_t ActionID, uint16_t *pUserError)
 {
-	/*switch (ActionID)
+	switch (ActionID)
 	{
-		case ACT_DBG_POWER_SUPPLY_CTRL:
+		case ACT_DBG_U_U_SET:
 			{
 				if(CONTROL_State == DS_None)
-					DBGACT_PowerSupplyEnable(DataTable[REG_DBG]);
+					DBGACT_UUSet();
 				else
 					*pUserError = ERR_OPERATION_BLOCKED;
 			}
 			break;
 
-		case ACT_DBG_PULSE:
+		case ACT_DBG_U_SHORT:
 			{
 				if(CONTROL_State == DS_None)
-					DBGACT_PulseProcess(DataTable[REG_DBG]);
+					DBGACT_UShortOut();
 				else
 					*pUserError = ERR_OPERATION_BLOCKED;
 			}
 			break;
 
-		case ACT_DBG_SET_CURRENT_RANGE:
+		case ACT_DBG_U_U_SEN:
 			{
 				if(CONTROL_State == DS_None)
-					DBGACT_SetCurrentRange(DataTable[REG_DBG]);
+					DBGACT_UUSen();
 				else
 					*pUserError = ERR_OPERATION_BLOCKED;
 			}
 			break;
 
-		case ACT_DBG_FAN_CTRL:
+		case ACT_DBG_U_I_SEN:
 			{
 				if(CONTROL_State == DS_None)
-					DBGACT_FanControl(DataTable[REG_DBG]);
+					DBGACT_UISen();
+				else
+					*pUserError = ERR_OPERATION_BLOCKED;
+			}
+			break;
+
+		//
+		case ACT_DBG_I_I_SET:
+			{
+				if(CONTROL_State == DS_None)
+					DBGACT_IISet();
+				else
+					*pUserError = ERR_OPERATION_BLOCKED;
+			}
+			break;
+
+		case ACT_DBG_I_START:
+			{
+				if(CONTROL_State == DS_None)
+					DBGACT_IStart();
+				else
+					*pUserError = ERR_OPERATION_BLOCKED;
+			}
+			break;
+
+		case ACT_DBG_I_I_GATE:
+			{
+				if(CONTROL_State == DS_None)
+					DBGACT_IIGate();
+				else
+					*pUserError = ERR_OPERATION_BLOCKED;
+			}
+			break;
+
+		case ACT_DBG_I_U_CUTOFF:
+			{
+				if(CONTROL_State == DS_None)
+					DBGACT_UUCutoffSet();
+				else
+					*pUserError = ERR_OPERATION_BLOCKED;
+			}
+			break;
+
+		case ACT_DBG_I_U_NEGATIVE:
+			{
+				if(CONTROL_State == DS_None)
+					DBGACT_UUNegativeSet();
 				else
 					*pUserError = ERR_OPERATION_BLOCKED;
 			}
@@ -50,7 +97,7 @@ bool DIAG_HandleDiagnosticAction(uint16_t ActionID, uint16_t *pUserError)
 
 		default:
 			return false;
-	}*/
+	}
 
 	return true;
 }
