@@ -264,9 +264,10 @@ void CONTROL_LogicProcess()
 
 void CONTROL_HighPriorityProcess()
 {
-	/*if(CONTROL_SubState == SS_Pulse)
+	if(CONTROL_SubState == SS_Pulse)
 	{
-		MEASURE_SampleParams(&RegulatorParams);
+		if (MEASURE_UParams(&RegulatorParams))
+			REGULATOR_UFormUpdate(&RegulatorParams);
 
 		if(CONTROL_RegulatorCycle(&RegulatorParams))
 		{
@@ -274,7 +275,7 @@ void CONTROL_HighPriorityProcess()
 			CONTROL_SetDeviceState(DS_InProcess, SS_WaitAfterPulse);
 			DataTable[REG_OP_RESULT] = OPRESULT_OK;
 		}
-	}*/
+	}
 }
 //-----------------------------------------------
 
@@ -290,7 +291,7 @@ void CONTROL_StartPrepare()
 	CU_LoadConvertParams();
 	REGULATOR_CashVariables(&RegulatorParams);
 	CONTROL_CashVariables();
-	CONTROL_SineConfig(&RegulatorParams);
+	CONTROL_UFormConfig(&RegulatorParams);
 	CONTROL_LinearConfig(&RegulatorParams);
 	CONTROL_CopyCurrentToEP(&RegulatorParams);
 
@@ -336,7 +337,6 @@ void CONTROL_StartProcess()
 	TIM_Start(TIM15);*/
 }
 //-----------------------------------------------
-
 
 void CONTROL_SwitchToFault(Int16U Reason)
 {
