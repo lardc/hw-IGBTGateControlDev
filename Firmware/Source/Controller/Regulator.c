@@ -110,30 +110,23 @@ void REGULATOR_UFormConfig(volatile RegulatorParamsStruct* Regulator)
 
 void REGULATOR_UFormUpdate (volatile RegulatorParamsStruct* Regulator)
 {
-	Int16U ConstantULastPulse = Regulator->RegulatorPulseCounter + (Int16U)((float)DataTable[REG_U_T_UCONSTANT] / PULSE_PERIOD);
-	if (ConstantULastPulse > PULSE_BUFFER_SIZE)
-		ConstantULastPulse = PULSE_BUFFER_SIZE;
+	Regulator->ConstantUFirstPulse = Regulator->RegulatorPulseCounter;
+	Regulator->ConstantULastPulse = Regulator->RegulatorPulseCounter + (Int16U)((float)DataTable[REG_U_T_UCONSTANT] / PULSE_PERIOD);
+	if (Regulator->ConstantULastPulse > PULSE_BUFFER_SIZE)
+		Regulator->ConstantULastPulse = PULSE_BUFFER_SIZE;
 	for (Int16U i = Regulator->RegulatorPulseCounter; i < PULSE_BUFFER_SIZE; i++)
-		i < ConstantULastPulse ? Regulator->UFormTable[i] = Regulator->UFormTable[Regulator->RegulatorPulseCounter] : Regulator->UFormTable[i] = 0;
+		i < Regulator->ConstantULastPulse ? Regulator->UFormTable[i] = Regulator->UFormTable[Regulator->RegulatorPulseCounter] : Regulator->UFormTable[i] = 0;
 }
 //-----------------------------------------------
 
 void REGULATOR_CashVariables(volatile RegulatorParamsStruct* Regulator)
 {
-	/*float CurrentMax = (float)DataTable[REG_CURRENT_PER_CURBOARD] / 10 * DataTable[REG_CURBOARD_QUANTITY];
-	float CurrentTarget = (float)DataTable[REG_CURRENT_PULSE_VALUE] / 10;
-
-	// Кеширование коэффициентов регулятора
-	for(int i = 0; i < CURRENT_RANGE_QUANTITY; i++)
-	{
-		Regulator->Kp[i] = (float)DataTable[REG_REGULATOR_RANGE0_Kp + i * 2] / 1000;
-		Regulator->Ki[i] = (float)DataTable[REG_REGULATOR_RANGE0_Ki + i * 2] / 1000;
-		Regulator->KiTune[i] = (CurrentMax - CurrentTarget) * (float)DataTable[REG_REGULATOR_TF_Ki_RANG0 + i] / 1e6;
-	}
-
+	Regulator->Kp = (float)DataTable[REG_REGULATOR__Kp] / 1000;
+	Regulator->Ki = (float)DataTable[REG_REGULATOR_Ki] / 1000;
+	Regulator->KiTune = (float)DataTable[REG_REGULATOR_TF_Ki] / 1e6;
 	Regulator->DebugMode = false;
 	Regulator->DACOffset = DataTable[REG_DAC_OFFSET];
 	Regulator->DACLimitValue = (DAC_MAX_VAL > DataTable[REG_DAC_OUTPUT_LIMIT_VALUE]) ? \
-			DataTable[REG_DAC_OUTPUT_LIMIT_VALUE] : DAC_MAX_VAL;*/
+			DataTable[REG_DAC_OUTPUT_LIMIT_VALUE] : DAC_MAX_VAL;
 }
 //-----------------------------------------------
