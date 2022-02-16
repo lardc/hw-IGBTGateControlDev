@@ -79,11 +79,13 @@ void REGULATOR_LoggingData(volatile RegulatorParamsStruct* Regulator)
 	{
 		ScopeLogStep = 0;
 
-		CONTROL_ValuesVoltage[LocalCounter] = (Int16U)(Regulator->UMeasured);
-		CONTROL_ValuesCurrent[LocalCounter] = (Int16U)(Regulator->IFormMeasured[Regulator->RegulatorPulseCounter]);
+		CONTROL_UUValues[LocalCounter] = (Int16U)(Regulator->UTarget);
+		CONTROL_UUMeasValues[LocalCounter] = (Int16U)(Regulator->UMeasured);
+		CONTROL_UIMeasValues[LocalCounter] = (Int16U)(Regulator->IFormMeasured[Regulator->RegulatorPulseCounter]);
 		CONTROL_RegulatorErr[LocalCounter] = (Int16S)(Regulator->RegulatorError);
 		CONTROL_RegulatorOutput[LocalCounter] = (Int16S)(Regulator->RegulatorOutput);
 		CONTROL_DACRawData[LocalCounter] = (Int16U)(Regulator->DACSetpoint);
+		CONTROL_IIGateValues[LocalCounter] = 0;
 
 		CONTROL_Values_Counter = LocalCounter;
 
@@ -91,11 +93,11 @@ void REGULATOR_LoggingData(volatile RegulatorParamsStruct* Regulator)
 	}
 
 	// Условие обновления глобального счетчика данных
-	if (CONTROL_Values_Counter < VALUES_x_SIZE)
+	if (CONTROL_Values_Counter < U_VALUES_x_SIZE)
 		CONTROL_Values_Counter = LocalCounter;
 
 	// Сброс локального счетчика
-	if (LocalCounter >= VALUES_x_SIZE)
+	if (LocalCounter >= U_VALUES_x_SIZE)
 		LocalCounter = 0;
 }
 //-----------------------------------------------
@@ -104,7 +106,7 @@ void REGULATOR_UFormConfig(volatile RegulatorParamsStruct* Regulator)
 {
 	Int16U UFrontLastPulse = (Int16U)((float)DataTable[REG_U_T_UFRONT] / PULSE_PERIOD);
 	for (Int16U i = 0; i < PULSE_BUFFER_SIZE; i++)
-		i < UFrontLastPulse ? Regulator->UFormTable[i] = (float)((DataTable[REG_U_UMAX] * i) / DataTable[REG_U_T_UFRONT]) : Regulator->UFormTable[i] = 0;
+		Regulator->UFormTable[i] = i < UFrontLastPulse ?  (float)((DataTable[REG_U_UMAX] * i) / DataTable[REG_U_T_UFRONT]) : 0;
 }
 //-----------------------------------------------
 
@@ -115,13 +117,13 @@ void REGULATOR_UFormUpdate (volatile RegulatorParamsStruct* Regulator)
 	if (Regulator->ConstantULastPulse > PULSE_BUFFER_SIZE)
 		Regulator->ConstantULastPulse = PULSE_BUFFER_SIZE;
 	for (Int16U i = Regulator->RegulatorPulseCounter; i < PULSE_BUFFER_SIZE; i++)
-		i < Regulator->ConstantULastPulse ? Regulator->UFormTable[i] = Regulator->UFormTable[Regulator->RegulatorPulseCounter] : Regulator->UFormTable[i] = 0;
+		Regulator->UFormTable[i] = i < Regulator->ConstantULastPulse ? Regulator->UFormTable[Regulator->RegulatorPulseCounter] : 0;
 }
 //-----------------------------------------------
 
 void REGULATOR_CashVariables(volatile RegulatorParamsStruct* Regulator)
 {
-	Regulator->Kp = (float)DataTable[REG_REGULATOR__Kp] / 1000;
+	Regulator->Kp = (float)DataTable[REG_REGULATOR_Kp] / 1000;
 	Regulator->Ki = (float)DataTable[REG_REGULATOR_Ki] / 1000;
 	Regulator->KiTune = (float)DataTable[REG_REGULATOR_TF_Ki] / 1e6;
 	Regulator->DebugMode = false;

@@ -10,57 +10,36 @@
 #define NO		0
 #define YES		1
 //
-#define I_RANGE0_THRESHOLD_MIN		0			// A * 10
-#define I_RANGE0_THRESHOLD_MAX		INT16U_MAX	// A * 10
-#define I_RANGE0_THRESHOLD_DEF		10000		// A * 10
-//
-#define I_RANGE1_THRESHOLD_MIN		0			// A * 10
-#define I_RANGE1_THRESHOLD_MAX		INT16U_MAX	// A * 10
-#define I_RANGE1_THRESHOLD_DEF		65000		// A * 10
-//
-#define V_BAT_THRESHOLD_MIN			100			// В * 10
-#define V_BAT_THRESHOLD_MAX			500			// В * 10
-#define V_BAT_THRESHOLD_DEF			450			// В * 10
-//
+
 #define DAC_OUTPUT_LIM_MIN			0
 #define DAC_OUTPUT_LIM_MAX			4095
-#define DAC_OUTPUT_LIM_DEF			3500
+#define DAC_OUTPUT_LIM_DEF			4095
 //
 #define DAC_OFFSET_MIN				0
 #define DAC_OFFSET_MAX				4095
-#define DAC_OFFSET_DEF				1300
+#define DAC_OFFSET_DEF				0
 //
-#define FULL_CHARGE_TIMEOUT_MIN		30000		// мс
-#define FULL_CHARGE_TIMEOUT_MAX		60000		// мс
-#define FULL_CHARGE_TIMEOUT_DEF		50000		// мс
+#define COEF_P0_MIN					INT16S_MIN
+#define COEF_P0_MAX					INT16S_MAX
+#define COEF_P0_DEF					0
 //
-#define RECHARGE_TIMEOUT_MIN		0			// мс
-#define RECHARGE_TIMEOUT_MAX		40000		// мс
-#define RECHARGE_TIMEOUT_DEF		20000		// мс
+#define COEF_P1_MIN					1
+#define COEF_P1_MAX					INT16U_MAX
+#define COEF_P1_DEF					1000
 //
-#define SHUNT_RESISTANCE_MIN		0			// мкОм
-#define SHUNT_RESISTANCE_MAX		5000		// мкОм
-#define SHUNT_RESISTANCE_DEF		250			// мкОм
-//
-#define AFTER_PULSE_PAUSE_MIN		0			// мс
-#define AFTER_PULSE_PAUSE_MAX		40000		// мс
-#define AFTER_PULSE_PAUSE_DEF		15000		// мс
-//
-#define I_PER_CURBOARD_MIN			500			// A * 10
-#define I_PER_CURBOARD_MAX			15000		// A * 10
-#define I_PER_CURBOARD_DEF			10833		// A * 10
-//
-#define CURBOARD_QUANTITY_MIN		1
-#define CURBOARD_QUANTITY_MAX		6
-#define CURBOARD_QUANTITY_DEF		6
-//
-#define COEF_P2_MIN					0
-#define COEF_P2_MAX					INT16U_MAX
+#define COEF_P2_MIN					INT16S_MIN
+#define COEF_P2_MAX					INT16S_MAX
 #define COEF_P2_DEF					0
 //
 #define COEF_K_MIN					1
 #define COEF_K_MAX					INT16U_MAX
-#define COEF_K_DEF					1000
+#define COEF_I_I_GATE_K_DEF			1
+#define COEF_U_I_SEN_K_DEF			141			// [мА*1000 / код]
+#define COEF_U_U_SEN_K_DEF			7324		// [мВ*1000 / код]
+#define COEF_I_I_K_DEF				1
+#define COEF_U_U_K_DEF				204			// [код*1000 / мВ]
+#define COEF_I_CUTOFF_K_DEF			1
+#define COEF_I_NEGATIVE_K_DEF		1
 //
 #define OFFSET_MIN					0
 #define OFFSET_MAX					INT16U_MAX
@@ -74,24 +53,18 @@
 #define REGULATOR_KI_MAX			INT16U_MAX
 #define REGULATOR_KI_DEF			0
 //
-#define CURRENT_SETPOINT_MIN		1000		// (А * 10)
-#define CURRENT_SETPOINT_MAX		65000		// (А * 10)
+
+#define CURRENT_TRIG_MIN			1			// [мА]
+#define CURRENT_TRIG_MAX			500			// [мА]
 //
-#define FAN_PERIOD_MIN				0			// сек
-#define FAN_PERIOD_MAX				600			// сек
-#define FAN_PERIOD_DEF				300			// сек
+#define T_UCONSTANT_MIN				1			// [мс]
+#define T_UCONSTANT_MAX				20			// [мс]
 //
-#define FAN_TIME_MIN				0			// сек
-#define FAN_TIME_MAX				600			// сек
-#define FAN_TIME_DEF				60			// сек
+#define T_UFRONT_MIN				1			// [мс]
+#define T_UFRONT_MAX				20			// [мс]
 //
-#define V_BAT_K_MIN					0
-#define V_BAT_K_MAX					INT16U_MAX
-#define V_BAT_K_DEF					13400
-//
-#define CONF_STATE_TIMEOUT_MIN		1000		// мс
-#define CONF_STATE_TIMEOUT_MAX		10000		// мс
-#define CONF_STATE_TIMEOUT_DEF		5000		// мс
+#define U_DEST_MIN					100			// [мВ]
+#define U_DEST_MAX					20000		// [мВ]
 
 // Types
 typedef struct __TableItemConstraint

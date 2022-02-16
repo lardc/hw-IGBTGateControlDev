@@ -31,49 +31,58 @@
 
 // Регистры
 // Сохраняемые регистры
-#define REG_DAC_OUTPUT_LIMIT_VALUE		3	// Ограничение выхода ЦАП (0 - 4095)
-#define REG_REGULATOR_QI_MAX			7	// Ограничение уровня интегральной составляющей
-#define REG_SCOPE_STEP					12	// Шаг сохранения оцифрованных значений
-#define REG_DAC_OFFSET					15	// Смещение сигнала с ЦАП
-
-#define REG_I_TO_DAC_RANGE0_K			20	// Диапазон 0 - Коэффициент пересчета в значение ЦАП
-#define REG_I_TO_DAC_RANGE0_B			21	// Диапазон 0 - Смещение пересчета в значение ЦАП
-#define REG_I_TO_DAC_RANGE1_K			22	// Диапазон 1 - Коэффициент пересчета в значение ЦАП
-#define REG_I_TO_DAC_RANGE1_B			23	// Диапазон 1 - Смещение пересчета в значение ЦАП
-#define REG_I_TO_DAC_RANGE2_K			24	// Диапазон 2 - Коэффициент пересчета в значение ЦАП
-#define REG_I_TO_DAC_RANGE2_B			25	// Диапазон 2 - Смещение пересчета в значение ЦАП
+#define REG_DAC_OUTPUT_LIMIT_VALUE		1	// Ограничение выхода ЦАП (0 - 4095)
+#define REG_REGULATOR_QI_MAX			2	// Ограничение уровня интегральной составляющей
+#define REG_SCOPE_STEP					3	// Шаг сохранения оцифрованных значений
+#define REG_DAC_OFFSET					4	// Смещение сигнала с ЦАП
 //
-#define REG_ADC_I_GATE_K				26	// Коэффициент преобразования кода АЦП в ток
-#define REG_ADC_I_SEN_K					27	// Коэффициент преобразования кода АЦП в ток
-#define REG_ADC_U_SEN_K					28	// Коэффициент преобразования кода АЦП в напряжение
-#define REG_DAC_I_K						29	// Коэффициент преобразования тока в код ЦАП
-#define REG_DAC_U_K						30	// Коэффициент преобразования напряжения в код ЦАП
-#define REG_EXT_DAC_CUTOFF_K			31	// Коэффициент преобразования напряжения в код внешнего ЦАП
-#define REG_EXT_DAC_NEGATIVE_K			32	// Коэффициент преобразования напряжения в код внешнего ЦАП
+#define REG_ADC_I_I_GATE_K				10	// Коэффициент преобразования кода АЦП в ток
+#define REG_ADC_U_I_SEN_K				11	// Коэффициент преобразования кода АЦП в ток
+#define REG_ADC_U_U_SEN_K				12	// Коэффициент преобразования кода АЦП в напряжение
+#define REG_DAC_I_I_K					13	// Коэффициент преобразования тока в код ЦАП
+#define REG_DAC_U_U_K					14	// Коэффициент преобразования напряжения в код ЦАП
+#define REG_EXT_DAC_I_CUTOFF_K			15	// Коэффициент преобразования напряжения в код внешнего ЦАП
+#define REG_EXT_DAC_I_NEGATIVE_K		16	// Коэффициент преобразования напряжения в код внешнего ЦАП
 //
-#define REG_ADC_I_RANGE1_P2				37	// Диапазон 1 - Коэффициент тонкой подстройки Р2 х1е6
-#define REG_ADC_I_RANGE1_P1				38	// Диапазон 1 - Коэффициент тонкой подстройки Р1 x1000
-#define REG_ADC_I_RANGE1_P0				39	// Диапазон 1 - Смещение тонкой подстройки Р0
-#define REG_ADC_I_RANGE1_N				40	// Диапазон 1 - Числитель коэффициента грубой подстройки
-#define REG_ADC_I_RANGE1_D				41	// Диапазон 1 - Знаменатель коэффициента грубой подстройки
-#define REG_ADC_I_RANGE1_B				42	// Диапазон 1 - Смещение тонкой подстройки B
+#define REG_ADC_I_I_GATE_P2				20	// Коэффициент тонкой подстройки Р2 х1е6
+#define REG_ADC_I_I_GATE_P1				21	// Коэффициент тонкой подстройки Р1 x1000
+#define REG_ADC_I_I_GATE_P0				22	// Смещение тонкой подстройки Р0
 //
-#define REG_ADC_I_RANGE2_P2				43	// Диапазон 2 - Коэффициент тонкой подстройки Р2 х1е6
-#define REG_ADC_I_RANGE2_P1				44	// Диапазон 2 - Коэффициент тонкой подстройки Р1 x1000
-#define REG_ADC_I_RANGE2_P0				45	// Диапазон 2 - Смещение тонкой подстройки Р0
-#define REG_ADC_I_RANGE2_N				46	// Диапазон 2 - Числитель коэффициента грубой подстройки
-#define REG_ADC_I_RANGE2_D				47	// Диапазон 2 - Знаменатель коэффициента грубой подстройки
-#define REG_ADC_I_RANGE2_B				48	// Диапазон 2 - Смещение тонкой подстройки B
+#define REG_ADC_U_I_SEN_P2				23	// Коэффициент тонкой подстройки Р2 х1е6
+#define REG_ADC_U_I_SEN_P1				24	// Коэффициент тонкой подстройки Р1 x1000
+#define REG_ADC_U_I_SEN_P0				25	// Смещение тонкой подстройки Р0
 //
-#define REG_REGULATOR_Kp				49	// Пропорциональный коэффициент регулятора
-#define REG_REGULATOR_Ki				50	// Интегральный коэффициент регулятора
-#define REG_REGULATOR_TF_Ki				55	// Коэффициент подстройки значения Ki (в ед. (dKi / dU) * 1000)
+#define REG_ADC_U_U_SEN_P2				26	// Коэффициент тонкой подстройки Р2 х1е6
+#define REG_ADC_U_U_SEN_P1				27	// Коэффициент тонкой подстройки Р1 x1000
+#define REG_ADC_U_U_SEN_P0				28	// Смещение тонкой подстройки Р0
+//
+#define REG_DAC_I_I_P1					30	// Коэффициент тонкой подстройки Р1 x1000
+#define REG_DAC_I_I_P0					31	// Смещение тонкой подстройки Р0
+//
+#define REG_DAC_U_U_P1					33	// Коэффициент тонкой подстройки Р1 x1000
+#define REG_DAC_U_U_P0					34	// Смещение тонкой подстройки Р0
+//
+#define REG_EXT_DAC_I_CUTOFF_P1			36	// Коэффициент тонкой подстройки Р1 x1000
+#define REG_EXT_DAC_I_CUTOFF_P0			37	// Смещение тонкой подстройки Р0
+//
+#define REG_EXT_DAC_I_NEGATIVE_P1		39	// Коэффициент тонкой подстройки Р1 x1000
+#define REG_EXT_DAC_I_NEGATIVE_P0		40	// Смещение тонкой подстройки Р0
+//
+#define REG_REGULATOR_Kp				50	// Пропорциональный коэффициент регулятора
+#define REG_REGULATOR_Ki				51	// Интегральный коэффициент регулятора
+#define REG_REGULATOR_TF_Ki				52	// Коэффициент подстройки значения Ki (в ед. (dKi / dU) * 1000)
 
 // Несохраняемые регистры чтения-записи
-#define REG_CURRENT_PULSE_VALUE			128	// Задание амплитуды импульса тока (А * 10)
-#define REG_USE_LINEAR_DOWN				130	// Спад тока идёт по линейному закону
-
+//
+// Регистры измерения VGS
+#define REG_U_I_TRIG					128	// Задание триггера тока [мА]
+#define REG_U_T_UCONSTANT				129	// Длительность полки напряжения [мс]
+#define REG_U_T_UFRONT					130	// Длительность фронта напряжения [мс]
+#define	REG_U_UMAX						131 // Макс значение фронта напряжения [мВ]
+// Регистры измерения QG
+//
 #define REG_DBG							150	// Регистр режима Отладки
+#define REG_REGULATOR_LOGGING			151	// Логгирование работы регулятора
 
 // Регистры только чтение
 #define REG_DEV_STATE					192	// Регистр состояния
@@ -84,8 +93,8 @@
 #define REG_OP_RESULT					197	// Регистр результата операции
 #define REG_SUB_STATE					198	// Регистр вспомогательного состояния
 
-#define REG_RESULT_CURRENT				200	// Достигнутое значение импульса тока (А * 10)
-#define REG_BATTERY_VOLTAGE				201	// Напряжение на батарее конденсаторов (В * 10)
+#define REG_U_VGS						200	// Измеренное значение VGS [мВ]
+#define REG_I_QG						201	// Измеренное значение QG [нКл]
 // -----------------------------
 #define REG_FWINFO_SLAVE_NID			256	// Device CAN slave node ID
 #define REG_FWINFO_MASTER_NID			257	// Device CAN master node ID (if presented)
@@ -117,11 +126,12 @@
 #define ERR_WRONG_PWD					4	//  Неправильный ключ
 
 // Endpoints
-#define EP_U_FORM						1
-#define	EP_U_MEAS_FORM					2
+#define EP_U_U_FORM						1
+#define	EP_U_U_MEAS_FORM				2
 #define EP_REGULATOR_OUTPUT				3
 #define EP_REGULATOR_ERR				4
 #define EP_U_DAC_RAW_DATA				5
-#define EP_I_MEAS_FORM					6
+#define EP_U_I_MEAS_FORM				6
+#define EP_I_I_GATE_FORM				7
 
 #endif //  __DEV_OBJ_DIC_H

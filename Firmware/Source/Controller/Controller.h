@@ -21,10 +21,9 @@ typedef enum __DeviceState
 typedef enum __DeviceSubState
 {
 	SS_None = 0,
-	SS_PowerPrepare = 1,
-	SS_PulsePrepare = 2,
-	SS_WaitAfterPulse = 3,
-	SS_Pulse = 4
+	SS_PulsePrepare = 1,
+	SS_Pulse = 2,
+	SS_WaitAfterPulse = 3
 } DeviceSubState;
 
 // Variables
@@ -34,11 +33,13 @@ extern volatile Int64U CONTROL_TimeCounter;
 extern Int64U CONTROL_LEDTimeout;
 extern volatile Int16U CONTROL_Values_Counter;
 extern volatile Int16U CONTROL_RegulatorErr_Counter;
-/*extern volatile Int16U CONTROL_ValuesCurrent[VALUES_x_SIZE];
-extern volatile Int16U CONTROL_RegulatorErr[VALUES_x_SIZE];
-extern volatile Int16U CONTROL_ValuesBatteryVoltage[VALUES_x_SIZE];
-extern volatile Int16U CONTROL_RegulatorOutput[VALUES_x_SIZE];
-extern volatile Int16U CONTROL_DACRawData[VALUES_x_SIZE];*/
+extern volatile Int16U CONTROL_UUValues[U_VALUES_x_SIZE];
+extern volatile Int16U CONTROL_UUMeasValues[U_VALUES_x_SIZE];
+extern volatile Int16U CONTROL_RegulatorOutput[U_VALUES_x_SIZE];
+extern volatile Int16U CONTROL_RegulatorErr[U_VALUES_x_SIZE];
+extern volatile Int16U CONTROL_DACRawData[U_VALUES_x_SIZE];
+extern volatile Int16U CONTROL_UIMeasValues[U_VALUES_x_SIZE];
+extern volatile Int16U CONTROL_IIGateValues[I_VALUES_x_SIZE];
 //
 extern volatile RegulatorParamsStruct RegulatorParams;
 
@@ -56,5 +57,8 @@ void CONTROL_LinearConfig(volatile RegulatorParamsStruct* Regulator);
 void CONTROL_CopyCurrentToEP(volatile RegulatorParamsStruct* Regulator);
 void CONTROL_StartProcess();
 void CONTROL_HandleFanLogic(bool IsImpulse);
+void CONTROL_UAverage();
+void CONTROL_UStartProcess();
+void CONTROL_UStopProcess();
 
 #endif // __CONTROLLER_H

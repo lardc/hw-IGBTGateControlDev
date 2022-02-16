@@ -9,7 +9,7 @@
 
 // Definitions
 //
-#define PULSE_BUFFER_SIZE	VALUES_x_SIZE
+#define PULSE_BUFFER_SIZE	U_VALUES_x_SIZE
 #define PULSE_PERIOD		TIMER15_uS
 
 // Structs
@@ -40,6 +40,8 @@ typedef struct __RegulatorParams
 //
 bool REGULATOR_Process(volatile RegulatorParamsStruct* Regulator);
 void REGULATOR_CashVariables(volatile RegulatorParamsStruct* Regulator);
+void REGULATOR_UFormConfig(volatile RegulatorParamsStruct* Regulator);
+void REGULATOR_UFormUpdate (volatile RegulatorParamsStruct* Regulator);
 //
 
 #endif /* REGULATOR_H_ */
