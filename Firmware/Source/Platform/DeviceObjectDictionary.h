@@ -18,7 +18,7 @@
 #define ACT_DBG_I_U_CUTOFF				63	// Установить значение напряжения отсечки из регистра DBG [mV]
 #define ACT_DBG_I_U_NEGATIVE			64	// Установить значение отрицательного напряжения смещения из регистра DBG [mV]
 //
-#define ACT_U_START						100	// Запуск формирования напряжения затвора
+#define ACT_VGS_START					100	// Старт измерения порогового напряжения затвора
 #define ACT_QG_START					101	// Старт измерения заряда затвора
 #define ACT_STOP_PROCESS				102	// Стоп измерения
 
@@ -31,24 +31,10 @@
 
 // Регистры
 // Сохраняемые регистры
-#define REG_CURRENT_THRESHOLD_RANGE0	0	// Верхний порог по току диапазона 0 (А * 10)
-#define REG_CURRENT_THRESHOLD_RANGE1	1	// Верхний порог по току диапазона 1 (А * 10)
-#define REG_BATTERY_VOLTAGE_THRESHOLD	2	// Порог заряда батареи конденсаторов (В * 10)
 #define REG_DAC_OUTPUT_LIMIT_VALUE		3	// Ограничение выхода ЦАП (0 - 4095)
-#define REG_BATTERY_FULL_CHRAGE_TIMEOUT	4	// Время таймаута полного заряда конденсаторов (мс)
-#define REG_BATTERY_RECHARGE_TIMEOUT	5	// Время таймаута дозаряда после импульса (мс)
-#define REG_SHUNT_RESISTANCE			6	// Сопротивление шунта (мкОм)
 #define REG_REGULATOR_QI_MAX			7	// Ограничение уровня интегральной составляющей
-#define REG_FAN_CTRL					8	// Включение управления вентилятором
-#define REG_AFTER_PULSE_PAUSE			9	// Пауза после импульса (мс)
-#define REG_CURRENT_PER_CURBOARD		10	// Максимальная амплитуда тока с одной CurrentBoard (А * 10)
-#define REG_CURBOARD_QUANTITY			11	// Количество CurrentBoard
 #define REG_SCOPE_STEP					12	// Шаг сохранения оцифрованных значений
-#define REG_FAN_OPERATE_PERIOD			13	// Период работы вентилятора (сек)
-#define REG_FAN_OPERATE_TIME			14	// Время включенного состояния вентилятора (сек)
 #define REG_DAC_OFFSET					15	// Смещение сигнала с ЦАП
-#define REG_CONFIG_READY_STATE_TIMEOUT	16	// Таймаут нахождения блока в состоянии DS_ConfigReady
-
 
 #define REG_I_TO_DAC_RANGE0_K			20	// Диапазон 0 - Коэффициент пересчета в значение ЦАП
 #define REG_I_TO_DAC_RANGE0_B			21	// Диапазон 0 - Смещение пересчета в значение ЦАП
@@ -79,16 +65,9 @@
 #define REG_ADC_I_RANGE2_D				47	// Диапазон 2 - Знаменатель коэффициента грубой подстройки
 #define REG_ADC_I_RANGE2_B				48	// Диапазон 2 - Смещение тонкой подстройки B
 //
-#define REG_REGULATOR_RANGE0_Kp			49	// Диапазон 0 - Пропорциональный коэффициент регулятора
-#define REG_REGULATOR_RANGE0_Ki			50	// Диапазон 0 - Интегральный коэффициент регулятора
-#define REG_REGULATOR_RANGE1_Kp			51	// Диапазон 1 - Пропорциональный коэффициент регулятора
-#define REG_REGULATOR_RANGE1_Ki			52	// Диапазон 1 - Интегральный коэффициент регулятора
-#define REG_REGULATOR_RANGE2_Kp			53	// Диапазон 2 - Пропорциональный коэффициент регулятора
-#define REG_REGULATOR_RANGE2_Ki			54	// Диапазон 2 - Интегральный коэффициент регулятора
-//
-#define REG_REGULATOR_TF_Ki_RANG0		55	// Диапазон 0 - Коэффициент подстройки значения Ki от тока (в ед. (dKi / dI) * 1000)
-#define REG_REGULATOR_TF_Ki_RANG1		56	// Диапазон 1 - Коэффициент подстройки значения Ki от тока (в ед. (dKi / dI) * 1000)
-#define REG_REGULATOR_TF_Ki_RANG2		57	// Диапазон 2 - Коэффициент подстройки значения Ki от тока (в ед. (dKi / dI) * 1000)
+#define REG_REGULATOR_Kp				49	// Пропорциональный коэффициент регулятора
+#define REG_REGULATOR_Ki				50	// Интегральный коэффициент регулятора
+#define REG_REGULATOR_TF_Ki				55	// Коэффициент подстройки значения Ki (в ед. (dKi / dU) * 1000)
 
 // Несохраняемые регистры чтения-записи
 #define REG_CURRENT_PULSE_VALUE			128	// Задание амплитуды импульса тока (А * 10)
@@ -138,11 +117,11 @@
 #define ERR_WRONG_PWD					4	//  Неправильный ключ
 
 // Endpoints
-#define EP_CURRENT						1
-#define	EP_BATTERY_VOLTAGE				2
+#define EP_U_FORM						1
+#define	EP_U_MEAS_FORM					2
 #define EP_REGULATOR_OUTPUT				3
 #define EP_REGULATOR_ERR				4
-#define EP_CUR_TABLE					5
-#define EP_DAC_RAW_DATA					6
+#define EP_U_DAC_RAW_DATA				5
+#define EP_I_MEAS_FORM					6
 
 #endif //  __DEV_OBJ_DIC_H

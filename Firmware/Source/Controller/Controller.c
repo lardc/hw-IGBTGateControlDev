@@ -28,12 +28,12 @@ volatile Int64U	CONTROL_AfterPulsePause = 0;
 volatile Int64U	CONTROL_BatteryChargeTimeCounter = 0;
 volatile Int64U CONTROL_ConfigStateCounter = 0;
 volatile Int16U CONTROL_Values_Counter = 0;
-/*volatile Int16U CONTROL_ValuesCurrent[VALUES_x_SIZE];
-volatile Int16U CONTROL_RegulatorErr[VALUES_x_SIZE];
-volatile Int16U CONTROL_ValuesBatteryVoltage[VALUES_x_SIZE];
+volatile Int16U CONTROL_UValues[VALUES_x_SIZE];
+volatile Int16U CONTROL_UMeasValues[VALUES_x_SIZE];
 volatile Int16U CONTROL_RegulatorOutput[VALUES_x_SIZE];
-volatile Int16U CONTROL_CurentTable[VALUES_x_SIZE];
-volatile Int16U CONTROL_DACRawData[VALUES_x_SIZE];*/
+volatile Int16U CONTROL_RegulatorErr[VALUES_x_SIZE];
+volatile Int16U CONTROL_DACRawData[VALUES_x_SIZE];
+volatile Int16U CONTROL_IMeasValues[VALUES_x_SIZE];
 //
 float CONTROL_CurrentMaxValue = 0;
 //
@@ -60,8 +60,8 @@ bool CONTROL_BatteryVoltageCheck();
 void CONTROL_Init()
 {
 	// Переменные для конфигурации EndPoint
-	/*Int16U EPIndexes[EP_COUNT] = {EP_CURRENT, EP_BATTERY_VOLTAGE, EP_REGULATOR_OUTPUT, EP_REGULATOR_ERR, EP_CUR_TABLE,
-			EP_DAC_RAW_DATA};
+	Int16U EPIndexes[EP_COUNT] = {EP_U_FORM, EP_U_MEAS_FORM, EP_REGULATOR_OUTPUT, EP_REGULATOR_ERR, EP_U_DAC_RAW_DATA,
+			EP_I_MEAS_FORM};
 
 	Int16U EPSized[EP_COUNT] =
 			{VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE};
@@ -70,9 +70,9 @@ void CONTROL_Init()
 			(pInt16U)&CONTROL_Values_Counter, (pInt16U)&CONTROL_Values_Counter, (pInt16U)&CONTROL_Values_Counter,
 			(pInt16U)&CONTROL_Values_Counter};
 
-	pInt16U EPDatas[EP_COUNT] = {(pInt16U)CONTROL_ValuesCurrent, (pInt16U)CONTROL_ValuesBatteryVoltage,
-			(pInt16U)CONTROL_RegulatorOutput, (pInt16U)CONTROL_RegulatorErr, (pInt16U)CONTROL_CurentTable,
-			(pInt16U)CONTROL_DACRawData};*/
+	pInt16U EPDatas[EP_COUNT] = {(pInt16U)CONTROL_UValues, (pInt16U)CONTROL_UMeasValues,
+			(pInt16U)CONTROL_RegulatorOutput, (pInt16U)CONTROL_RegulatorErr, (pInt16U)CONTROL_DACRawData,
+			(pInt16U)CONTROL_IMeasValues};
 
 	// Конфигурация сервиса работы Data-table и EPROM
 	EPROMServiceConfig EPROMService = {(FUNC_EPROM_WriteValues)&NFLASH_WriteDT, (FUNC_EPROM_ReadValues)&NFLASH_ReadDT};
@@ -82,7 +82,7 @@ void CONTROL_Init()
 
 	// Инициализация device profile
 	DEVPROFILE_Init(&CONTROL_DispatchAction, &CycleActive);
-	//DEVPROFILE_InitEPService(EPIndexes, EPSized, EPCounters, EPDatas);
+	DEVPROFILE_InitEPService(EPIndexes, EPSized, EPCounters, EPDatas);
 	// Сброс значений
 	DEVPROFILE_ResetControlSection();
 	CONTROL_ResetToDefaultState();
@@ -230,7 +230,7 @@ void CONTROL_HighPriorityProcess()
 
 		if(CONTROL_RegulatorCycle(&RegulatorParams))
 		{
-			CONTROL_StopProcess();
+			CONTROL_UStopProcess();
 			CONTROL_SetDeviceState(DS_InProcess, SS_WaitAfterPulse);
 		}
 	}
@@ -277,6 +277,13 @@ void CONTROL_UStartProcess()
 	LL_UShortOut(false);
 	TIM_Reset(TIM15);
 	TIM_Start(TIM15);
+}
+//-----------------------------------------------
+
+void CONTROL_DataToEP(volatile RegulatorParamsStruct* Regulator)
+{
+	for(int i = 0; i < PULSE_BUFFER_SIZE; ++i)
+		CONTROL_CurentTable[i] = (Int16S)Regulator->CurrentTable[i];
 }
 //-----------------------------------------------
 
