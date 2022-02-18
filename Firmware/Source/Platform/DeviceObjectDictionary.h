@@ -80,6 +80,10 @@
 #define REG_U_T_UFRONT					130	// Длительность фронта напряжения [мс]
 #define	REG_U_UMAX						131 // Макс значение фронта напряжения [мВ]
 // Регистры измерения QG
+#define REG_I_U_CUTOFF					135	// Ограничение напряжения затвора [мВ]
+#define REG_I_U_NEGATIVE				136	// Отрицательное напряжение, приложенное к затвору [мВ]
+#define REG_I_I_SET						137	// Ток затвора [мА]
+#define REG_I_T_CURRENT					138	// Длительность тока затвора [мкс]
 //
 #define REG_DBG							150	// Регистр режима Отладки
 #define REG_REGULATOR_LOGGING			151	// Логгирование работы регулятора
@@ -92,9 +96,11 @@
 #define REG_PROBLEM						196	// Регистр Problem
 #define REG_OP_RESULT					197	// Регистр результата операции
 #define REG_SUB_STATE					198	// Регистр вспомогательного состояния
-
+//
 #define REG_U_VGS						200	// Измеренное значение VGS [мВ]
 #define REG_I_QG						201	// Измеренное значение QG [нКл]
+#define REG_I_T_IGATE					202 // Измеренная длительность импульса тока [мкс]
+#define REG_I_AVERAGE_IGATE				203 // Усредненное измеренное значение тока [мА]
 // -----------------------------
 #define REG_FWINFO_SLAVE_NID			256	// Device CAN slave node ID
 #define REG_FWINFO_MASTER_NID			257	// Device CAN master node ID (if presented)

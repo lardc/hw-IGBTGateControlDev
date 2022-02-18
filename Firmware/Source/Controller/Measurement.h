@@ -7,10 +7,16 @@
 #include "ConvertUtils.h"
 #include "Regulator.h"
 
+// Variables
+extern Int16U MEASURE_ADC_IGateRaw[ADC_DMA_BUFF_SIZE];
+
 // Functions
 Int16U MEASURE_UUSen();
 Int16U MEASURE_UISen();
 Int16U MEASURE_IIGate();
 Boolean MEASURE_UParams(volatile RegulatorParamsStruct* Regulator);
+Int16U MEASURE_Average(Int16U* InputArray, Int16U ArraySize);
+void MEASURE_DMAIGateBufferClear();
+Int16U MEASURE_DMAExtractIGate();
 
 #endif /* MEASUREMENT_H_ */

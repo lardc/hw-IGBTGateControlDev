@@ -10,7 +10,7 @@
 
 #define EP_COUNT								7		// Количество массивов для чтения
 #define ENABLE_LOCKING							FALSE	// Защита NV регистров паролем
-#define CURRENT_PULSE_WIDTH						300		// Макс длительность импульса тока (мкс)
+#define CURRENT_PULSE_WIDTH						300000	// Макс длительность импульса тока (нс)
 #define VOLTAGE_PULSE_WIDTH						20000	// Макс длительность импульса напряжения (мкс)
 
 #define PI										3.1416f	// Значение числа Пи
@@ -20,7 +20,7 @@
 
 // Размер массивов EP
 #define U_VALUES_x_SIZE	(VOLTAGE_PULSE_WIDTH / TIMER15_uS)
-#define I_VALUES_x_SIZE	(CURRENT_PULSE_WIDTH / TIMER15_uS)
+#define I_VALUES_x_SIZE	(CURRENT_PULSE_WIDTH / TIMER6_nS)
 // Временные параметры
 #define TIME_LED_BLINK							500		// Мигание светодиодом (в мс)
 

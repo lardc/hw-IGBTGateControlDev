@@ -10,7 +10,7 @@
 void LL_ToggleBoardLED();
 void LL_UShortOut(bool State);
 void LL_IStart(bool State);
-void LL_ICompState();
+bool LL_ICompState();
 void LL_IISetDAC(Int16U Data);
 void LL_UUSetDAC(Int16U Data);
 void LL_ExtDACSync(bool State);

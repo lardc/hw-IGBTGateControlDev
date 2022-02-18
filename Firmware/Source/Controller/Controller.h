@@ -23,7 +23,8 @@ typedef enum __DeviceSubState
 	SS_None = 0,
 	SS_PulsePrepare = 1,
 	SS_Pulse = 2,
-	SS_WaitAfterPulse = 3
+	SS_WaitAfterUPulse = 3,
+	SS_WaitAfterIPulse = 4
 } DeviceSubState;
 
 // Variables
@@ -32,6 +33,7 @@ extern volatile DeviceState CONTROL_State;
 extern volatile Int64U CONTROL_TimeCounter;
 extern Int64U CONTROL_LEDTimeout;
 extern volatile Int16U CONTROL_Values_Counter;
+extern volatile Int16U CONTROL_I_Values_Counter;
 extern volatile Int16U CONTROL_RegulatorErr_Counter;
 extern volatile Int16U CONTROL_UUValues[U_VALUES_x_SIZE];
 extern volatile Int16U CONTROL_UUMeasValues[U_VALUES_x_SIZE];
@@ -50,14 +52,13 @@ void CONTROL_Init();
 void CONTROL_Idle();
 void CONTROL_SetDeviceState(DeviceState NewState, DeviceSubState NewSubState);
 void CONTROL_DelayMs(uint32_t Delay);
-void CONTROL_HighPriorityProcess();
+void CONTROL_UHighPriorityProcess();
+void CONTROL_IHighPriorityProcess(bool IsGateCurrent);
 void CONTROL_ExternalInterruptProcess();
-void CONTROL_SineConfig(volatile RegulatorParamsStruct* Regulator);
-void CONTROL_LinearConfig(volatile RegulatorParamsStruct* Regulator);
-void CONTROL_CopyCurrentToEP(volatile RegulatorParamsStruct* Regulator);
-void CONTROL_StartProcess();
-void CONTROL_HandleFanLogic(bool IsImpulse);
-void CONTROL_UAverage();
+void CONTROL_UStartProcess();
+void CONTROL_IStartProcess();
+void CONTROL_USetResults(volatile RegulatorParamsStruct* Regulator);
+void CONTROL_ISetResults();
 void CONTROL_UStartProcess();
 void CONTROL_UStopProcess();
 

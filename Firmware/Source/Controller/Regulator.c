@@ -85,7 +85,6 @@ void REGULATOR_LoggingData(volatile RegulatorParamsStruct* Regulator)
 		CONTROL_RegulatorErr[LocalCounter] = (Int16S)(Regulator->RegulatorError);
 		CONTROL_RegulatorOutput[LocalCounter] = (Int16S)(Regulator->RegulatorOutput);
 		CONTROL_DACRawData[LocalCounter] = (Int16U)(Regulator->DACSetpoint);
-		CONTROL_IIGateValues[LocalCounter] = 0;
 
 		CONTROL_Values_Counter = LocalCounter;
 

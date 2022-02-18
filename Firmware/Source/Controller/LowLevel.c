@@ -25,9 +25,9 @@ void LL_IStart(bool State)
 }
 //-----------------------------
 
-void LL_ICompState()
+bool LL_ICompState()
 {
-	GPIO_GetState(GPIO_I_COMP);
+	return GPIO_GetState(GPIO_I_COMP);
 }
 //-----------------------------
 

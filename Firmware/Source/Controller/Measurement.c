@@ -6,7 +6,7 @@
 #include "Global.h"
 
 // Variables
-
+Int16U MEASURE_ADC_IGateRaw[ADC_DMA_BUFF_SIZE];
 
 // Functions
 //
@@ -46,4 +46,28 @@ Boolean MEASURE_UParams(volatile RegulatorParamsStruct* Regulator)
 		return true;
 	}
 	else return false;
+}
+//-----------------------------------------------
+
+void MEASURE_DMAIGateBufferClear()
+{
+	for(int i = 0; i < ADC_DMA_BUFF_SIZE; i++)
+		MEASURE_ADC_IGateRaw[i] = 0;
+}
+//-----------------------------------------------
+
+Int16U MEASURE_DMAExtractIGate()
+{
+	return MEASURE_Average(&MEASURE_ADC_IGateRaw[1], ADC_DMA_BUFF_SIZE - 1);
+}
+//-----------------------------------------------
+
+Int16U MEASURE_Average(Int16U* InputArray, Int16U ArraySize)
+{
+	Int32U AverageData = 0;
+
+	for(int i = 0; i < ArraySize; i++)
+		AverageData += *(InputArray + i);
+
+	return (Int16U)((float)AverageData / ArraySize);
 }

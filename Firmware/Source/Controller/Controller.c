@@ -12,6 +12,7 @@
 #include "BCCIxParams.h"
 #include "Measurement.h"
 #include "math.h"
+#include "ExternalDAC.h"
 
 // Types
 //
@@ -28,6 +29,7 @@ volatile Int64U	CONTROL_AfterPulsePause = 0;
 volatile Int64U	CONTROL_BatteryChargeTimeCounter = 0;
 volatile Int64U CONTROL_ConfigStateCounter = 0;
 volatile Int16U CONTROL_Values_Counter = 0;
+volatile Int16U CONTROL_I_Values_Counter = 0;
 volatile Int16U CONTROL_UUValues[U_VALUES_x_SIZE];
 volatile Int16U CONTROL_UUMeasValues[U_VALUES_x_SIZE];
 volatile Int16U CONTROL_RegulatorOutput[U_VALUES_x_SIZE];
@@ -40,7 +42,6 @@ float CONTROL_CurrentMaxValue = 0;
 //
 volatile RegulatorParamsStruct RegulatorParams;
 static FUNC_AsyncDelegate LowPriorityHandle = NULL;
-
 /// Forward functions
 //
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError);
@@ -69,7 +70,7 @@ void CONTROL_Init()
 
 	pInt16U EPCounters[EP_COUNT] = {(pInt16U)&CONTROL_Values_Counter, (pInt16U)&CONTROL_Values_Counter,
 			(pInt16U)&CONTROL_Values_Counter, (pInt16U)&CONTROL_Values_Counter, (pInt16U)&CONTROL_Values_Counter,
-			(pInt16U)&CONTROL_Values_Counter, (pInt16U)&CONTROL_Values_Counter};
+			(pInt16U)&CONTROL_Values_Counter, (pInt16U)&CONTROL_I_Values_Counter};
 
 	pInt16U EPDatas[EP_COUNT] = {(pInt16U)CONTROL_UUValues, (pInt16U)CONTROL_UUMeasValues,
 			(pInt16U)CONTROL_RegulatorOutput, (pInt16U)CONTROL_RegulatorErr, (pInt16U)CONTROL_DACRawData,
@@ -164,7 +165,8 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 		case ACT_QG_START:
 			if (CONTROL_State == DS_Ready)
 			{
-
+				CONTROL_SetDeviceState(DS_InProcess, SS_PulsePrepare);
+				CONTROL_IStartProcess();
 			}
 			else
 				if (CONTROL_State == DS_InProcess)
@@ -211,8 +213,12 @@ void CONTROL_LogicProcess()
 			CONTROL_SetDeviceState(DS_Ready, SS_Pulse);
 			break;
 
-		case SS_WaitAfterPulse:
-			CONTROL_UAverage(&RegulatorParams);
+		case SS_WaitAfterUPulse:
+			CONTROL_USetResults(&RegulatorParams);
+			break;
+
+		case SS_WaitAfterIPulse:
+			CONTROL_ISetResults(&RegulatorParams);
 			break;
 
 		default:
@@ -221,8 +227,7 @@ void CONTROL_LogicProcess()
 }
 //-----------------------------------------------
 
-
-void CONTROL_HighPriorityProcess()
+void CONTROL_UHighPriorityProcess()
 {
 	if(CONTROL_SubState == SS_Pulse)
 	{
@@ -232,7 +237,26 @@ void CONTROL_HighPriorityProcess()
 		if(CONTROL_RegulatorCycle(&RegulatorParams))
 		{
 			CONTROL_UStopProcess();
-			CONTROL_SetDeviceState(DS_InProcess, SS_WaitAfterPulse);
+			CONTROL_SetDeviceState(DS_InProcess, SS_WaitAfterUPulse);
+		}
+	}
+}
+//-----------------------------------------------
+
+void CONTROL_IHighPriorityProcess(bool IsGateCurrent)
+{
+	if(CONTROL_SubState == SS_Pulse)
+	{
+		if (IsGateCurrent)
+		{
+			CONTROL_IIGateValues[CONTROL_I_Values_Counter] = MEASURE_DMAExtractIGate();
+			CONTROL_I_Values_Counter++;
+		}
+		else
+		{
+			TIM_Stop(TIM6);
+			TIM_StatusClear(TIM6);
+			CONTROL_SetDeviceState(DS_InProcess, SS_WaitAfterIPulse);
 		}
 	}
 }
@@ -244,7 +268,7 @@ bool CONTROL_RegulatorCycle(volatile RegulatorParamsStruct* Regulator)
 }
 //-----------------------------------------------
 
-void CONTROL_UAverage(volatile RegulatorParamsStruct* Regulator)
+void CONTROL_USetResults(volatile RegulatorParamsStruct* Regulator)
 {
 	float Result = Regulator->UFormMeasured[Regulator->ConstantUFirstPulse];
 	if ((Regulator->ConstantUFirstPulse) != (Regulator->ConstantULastPulse))
@@ -258,8 +282,28 @@ void CONTROL_UAverage(volatile RegulatorParamsStruct* Regulator)
 }
 //-----------------------------------------------
 
+void CONTROL_ISetResults()
+{
+	float Result;
+	for (Int16U i = 0; i < CONTROL_I_Values_Counter; i++)
+			Result += CONTROL_IIGateValues[i];
+	Result /= CONTROL_I_Values_Counter;
+
+	float Time = CONTROL_I_Values_Counter * TIMER6_uS;
+	float Qgate = Result * Time;
+
+	DataTable[REG_I_T_IGATE] = (Int16U)(Time);
+	DataTable[REG_I_AVERAGE_IGATE] = (Int16U)(Result);
+	DataTable[REG_I_QG] = (Int16U)(Qgate);
+
+	CONTROL_I_Values_Counter = 0;
+	CONTROL_SetDeviceState(DS_Ready, SS_None);
+}
+//-----------------------------------------------
+
 void CONTROL_StartPrepare()
 {
+	MEASURE_DMAIGateBufferClear();
 	CU_LoadConvertParams();
 	REGULATOR_CashVariables(&RegulatorParams);
 	REGULATOR_UFormConfig(&RegulatorParams);
@@ -276,6 +320,15 @@ void CONTROL_UStopProcess()
 void CONTROL_UStartProcess()
 {
 	LL_UShortOut(false);
+	TIM_Reset(TIM15);
+	TIM_Start(TIM15);
+}
+//-----------------------------------------------
+
+void CONTROL_IStartProcess()
+{
+	ExDAC_IUCutoff((float)DataTable[REG_I_U_CUTOFF]);
+	ExDAC_IUNegative((float)DataTable[REG_I_U_NEGATIVE]);
 	TIM_Reset(TIM15);
 	TIM_Start(TIM15);
 }
