@@ -14,21 +14,21 @@ Int16U MEASURE_ADC_IGateRaw[ADC_DMA_BUFF_SIZE];
 Int16U MEASURE_UUSen()
 {
 	Int16U result = ADC_Measure(ADC3, ADC3_U_SEN_CHANNEL);
-	return (result > 0) ? result : 0;
+	return result;
 }
 //-----------------------------------------------
 
 Int16U MEASURE_UISen()
 {
 	Int16U result = ADC_Measure(ADC1, ADC1_I_SEN_CHANNEL);
-	return (result > 0) ? result : 0;
+	return result;
 }
 //-----------------------------------------------
 
 Int16U MEASURE_IIGate()
 {
 	Int16U result = ADC_Measure(ADC1, ADC1_I_GATE_CHANNEL);
-	return (result > 0) ? result : 0;
+	return result;
 }
 //-----------------------------------------------
 

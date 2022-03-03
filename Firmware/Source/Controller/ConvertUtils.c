@@ -5,14 +5,6 @@
 #include "DataTable.h"
 #include "Global.h"
 
-// Structs
-typedef struct __ConvertParams
-{
-	float P2;
-	float P1;
-	float P0;
-	float K;
-}ConvertParams;
 
 // Variables
 ConvertParams AdcToUUSenParams;
@@ -52,28 +44,42 @@ Int16U CU_IIToDAC(float Value)
 float CU_UADCUToX(Int16U Data)
 {
 	float Value = Data * AdcToUUSenParams.K;
-	return (float)(Value * Value * AdcToUUSenParams.P2 + Value * AdcToUUSenParams.P1 + AdcToUUSenParams.P0);
+	return (Value * Value * AdcToUUSenParams.P2 + Value * AdcToUUSenParams.P1 + AdcToUUSenParams.P0);
 }
 //-----------------------------
 
 float CU_UADCIToX(Int16U Data)
 {
 	float Value = Data * AdcToUISenParams.K;
-	return (float)(Value * Value * AdcToUISenParams.P2 + Value * AdcToUISenParams.P1 + AdcToUISenParams.P0);
+	return (Value * Value * AdcToUISenParams.P2 + Value * AdcToUISenParams.P1 + AdcToUISenParams.P0);
 }
 //-----------------------------
 
 float CU_IADCIToX(Int16U Data)
 {
 	float Value = Data * AdcToIIGateParams.K;
-	return (float)(Value * Value * AdcToIIGateParams.P2 + Value * AdcToIIGateParams.P1 + AdcToIIGateParams.P0);
+	return (Value * Value * AdcToIIGateParams.P2 + Value * AdcToIIGateParams.P1 + AdcToIIGateParams.P0);
 }
 //-----------------------------
 
+void CU_LoadSingleConvertParams(ConvertParams* StructureName, Int16U RegK, Int16U RegP0, Int16U RegP1, Int16U RegP2)
+{
+	StructureName->K = (float)DataTable[RegK];
+	StructureName->P0 = (float)(Int16S)DataTable[RegP0];
+	StructureName->P1 = (float)DataTable[RegP1] / 1000;
+	StructureName->P2 = (RegP2 == 0) ? 0 : (float)((Int16S)DataTable[RegP2]) / 1e6;
+}
 
 void CU_LoadConvertParams()
 {
-	AdcToUUSenParams.K = (float)DataTable[REG_ADC_U_U_SEN_K];
+	CU_LoadSingleConvertParams(&AdcToUUSenParams, REG_ADC_U_U_SEN_K, REG_ADC_U_U_SEN_P0, REG_ADC_U_U_SEN_P1, REG_ADC_U_U_SEN_P2);
+	CU_LoadSingleConvertParams(&AdcToUISenParams, REG_ADC_U_I_SEN_K, REG_ADC_U_I_SEN_P0, REG_ADC_U_I_SEN_P1, REG_ADC_U_I_SEN_P2);
+	CU_LoadSingleConvertParams(&AdcToIIGateParams, REG_ADC_I_I_GATE_K, REG_ADC_I_I_GATE_P0, REG_ADC_I_I_GATE_P1, REG_ADC_I_I_GATE_P2);
+	CU_LoadSingleConvertParams(&UUToDACParams, REG_DAC_U_U_K, REG_DAC_U_U_P0, REG_DAC_U_U_P1, 0);
+	CU_LoadSingleConvertParams(&IIToDACParams, REG_DAC_I_I_K, REG_DAC_I_I_P0, REG_DAC_I_I_P1, 0);
+	CU_LoadSingleConvertParams(&UCutoffToExtDACParams, REG_EXT_DAC_I_CUTOFF_K, REG_EXT_DAC_I_CUTOFF_P0, REG_EXT_DAC_I_CUTOFF_P1, 0);
+	CU_LoadSingleConvertParams(&UNegativeToExtDACParams, REG_EXT_DAC_I_NEGATIVE_K, REG_EXT_DAC_I_NEGATIVE_P0, REG_EXT_DAC_I_NEGATIVE_P1, 0);
+	/*AdcToUUSenParams.K = (float)DataTable[REG_ADC_U_U_SEN_K];
 	AdcToUUSenParams.P0 = (float)((Int16S)DataTable[REG_ADC_U_U_SEN_P0]);
 	AdcToUUSenParams.P1 = (float)DataTable[REG_ADC_U_U_SEN_P1] / 1000;
 	AdcToUUSenParams.P2 = (float)((Int16S)DataTable[REG_ADC_U_U_SEN_P2]) / 1e6;
@@ -102,7 +108,7 @@ void CU_LoadConvertParams()
 
 	UNegativeToExtDACParams.K = (float)DataTable[REG_EXT_DAC_I_NEGATIVE_K] / 1000;
 	UNegativeToExtDACParams.P1 = (float)DataTable[REG_EXT_DAC_I_NEGATIVE_P1] / 1000;
-	UNegativeToExtDACParams.P0 = (float)(Int16S)DataTable[REG_EXT_DAC_I_NEGATIVE_P0];
+	UNegativeToExtDACParams.P0 = (float)(Int16S)DataTable[REG_EXT_DAC_I_NEGATIVE_P0];*/
 }
 //-----------------------------
 

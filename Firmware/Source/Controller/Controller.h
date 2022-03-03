@@ -27,21 +27,28 @@ typedef enum __DeviceSubState
 	SS_WaitAfterIPulse = 4
 } DeviceSubState;
 
+typedef enum __DeviceWarning
+{
+	DW_None = 0,
+	DW_CurrentNotReached = 1
+} DeviceWarning;
+
 // Variables
 //
 extern volatile DeviceState CONTROL_State;
 extern volatile Int64U CONTROL_TimeCounter;
+extern volatile Int64U CONTROL_I_TimeCounter;
 extern Int64U CONTROL_LEDTimeout;
 extern volatile Int16U CONTROL_Values_Counter;
 extern volatile Int16U CONTROL_I_Values_Counter;
 extern volatile Int16U CONTROL_RegulatorErr_Counter;
-extern volatile Int16U CONTROL_UUValues[U_VALUES_x_SIZE];
-extern volatile Int16U CONTROL_UUMeasValues[U_VALUES_x_SIZE];
-extern volatile Int16U CONTROL_RegulatorOutput[U_VALUES_x_SIZE];
-extern volatile Int16U CONTROL_RegulatorErr[U_VALUES_x_SIZE];
-extern volatile Int16U CONTROL_DACRawData[U_VALUES_x_SIZE];
-extern volatile Int16U CONTROL_UIMeasValues[U_VALUES_x_SIZE];
-extern volatile Int16U CONTROL_IIGateValues[I_VALUES_x_SIZE];
+extern volatile Int16U CONTROL_UUValues[];
+extern volatile Int16U CONTROL_UUMeasValues[];
+extern volatile Int16U CONTROL_RegulatorOutput[];
+extern volatile Int16U CONTROL_RegulatorErr[];
+extern volatile Int16U CONTROL_DACRawData[];
+extern volatile Int16U CONTROL_UIMeasValues[];
+extern volatile Int16U CONTROL_IIGateValues[];
 //
 extern volatile RegulatorParamsStruct RegulatorParams;
 
@@ -51,9 +58,10 @@ extern volatile RegulatorParamsStruct RegulatorParams;
 void CONTROL_Init();
 void CONTROL_Idle();
 void CONTROL_SetDeviceState(DeviceState NewState, DeviceSubState NewSubState);
+void CONTROL_SetDeviceWarning(DeviceWarning NewWarning);
 void CONTROL_DelayMs(uint32_t Delay);
 void CONTROL_UHighPriorityProcess();
-void CONTROL_IHighPriorityProcess(bool IsGateCurrent);
+void CONTROL_IHighPriorityProcess(bool IsInProgress, bool IsGateCurrent);
 void CONTROL_ExternalInterruptProcess();
 void CONTROL_UStartProcess();
 void CONTROL_IStartProcess();

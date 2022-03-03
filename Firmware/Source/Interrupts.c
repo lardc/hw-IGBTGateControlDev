@@ -35,8 +35,9 @@ void EXTI15_10_IRQHandler(void)
 {
 	EXTI_FlagReset(EXTI_15);
 	if (LL_ICompState())
-		TIM_Start(TIM6);
-	else CONTROL_IHighPriorityProcess(false);
+		CONTROL_IHighPriorityProcess(true, true);
+	else
+		CONTROL_IHighPriorityProcess(false, true);
 }
 //-----------------------------------------------
 
@@ -55,7 +56,10 @@ void TIM6_IRQHandler()
 {
 	if(TIM_StatusCheck(TIM6))
 	{
-		CONTROL_IHighPriorityProcess(true);
+		if(++CONTROL_I_TimeCounter > (Int16U)((float)DataTable[REG_I_T_CURRENT] / (float)TIMER6_uS))
+			CONTROL_IHighPriorityProcess(false, false);
+		else
+			CONTROL_IHighPriorityProcess(true, false);
 		TIM_StatusClear(TIM6);
 	}
 }

@@ -33,13 +33,13 @@
 //
 #define COEF_K_MIN					1
 #define COEF_K_MAX					INT16U_MAX
-#define COEF_I_I_GATE_K_DEF			1
+#define COEF_I_I_GATE_K_DEF			122			// [мА*1000 / код]
 #define COEF_U_I_SEN_K_DEF			141			// [мА*1000 / код]
 #define COEF_U_U_SEN_K_DEF			7324		// [мВ*1000 / код]
-#define COEF_I_I_K_DEF				1
+#define COEF_I_I_K_DEF				6827		// [код*1000 / мА]
 #define COEF_U_U_K_DEF				204			// [код*1000 / мВ]
-#define COEF_I_CUTOFF_K_DEF			1
-#define COEF_I_NEGATIVE_K_DEF		1
+#define COEF_I_CUTOFF_K_DEF			162			// [код*1000 / мВ]
+#define COEF_I_NEGATIVE_K_DEF		201			// [код*1000 / мВ]
 //
 #define OFFSET_MIN					0
 #define OFFSET_MAX					INT16U_MAX
@@ -65,6 +65,20 @@
 //
 #define U_DEST_MIN					100			// [мВ]
 #define U_DEST_MAX					20000		// [мВ]
+//
+#define I_U_CUTOFF_MIN				0			// [мВ]
+#define I_U_CUTOFF_MAX				20000		// [мВ]
+#define I_U_CUTOFF_DEF				15000		// [мВ]
+//
+#define I_U_NEGATIVE_MIN			0			// [мВ]
+#define I_U_NEGATIVE_MAX			20000		// [мВ]
+#define I_U_NEGATIVE_DEF			8000		// [мВ]
+//
+#define I_I_SET_MIN					20			// [мА]
+#define I_I_SET_MAX					500			// [мА]
+//
+#define I_T_CURRENT_MIN				20			// [мс]
+#define I_T_CURRENT_MAX				500			// [мс]
 
 // Types
 typedef struct __TableItemConstraint

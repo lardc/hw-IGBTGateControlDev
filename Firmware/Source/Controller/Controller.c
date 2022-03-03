@@ -25,6 +25,10 @@ volatile DeviceSubState CONTROL_SubState = SS_None;
 static Boolean CycleActive = false;
 //
 volatile Int64U CONTROL_TimeCounter = 0;
+volatile Int64U CONTROL_I_TimeCounter = 0;
+volatile Int64U CONTROL_I_Start_Counter = 0;
+volatile Int64U CONTROL_I_Stop_Counter = 0;
+//
 volatile Int64U	CONTROL_AfterPulsePause = 0;
 volatile Int64U	CONTROL_BatteryChargeTimeCounter = 0;
 volatile Int64U CONTROL_ConfigStateCounter = 0;
@@ -165,7 +169,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 		case ACT_QG_START:
 			if (CONTROL_State == DS_Ready)
 			{
-				CONTROL_SetDeviceState(DS_InProcess, SS_PulsePrepare);
+				CONTROL_SetDeviceState(DS_InProcess, SS_Pulse);
 				CONTROL_IStartProcess();
 			}
 			else
@@ -243,12 +247,13 @@ void CONTROL_UHighPriorityProcess()
 }
 //-----------------------------------------------
 
-void CONTROL_IHighPriorityProcess(bool IsGateCurrent)
+void CONTROL_IHighPriorityProcess(bool IsInProgress, bool IsGateCurrent)
 {
 	if(CONTROL_SubState == SS_Pulse)
 	{
-		if (IsGateCurrent)
+		if (IsInProgress)
 		{
+			if (IsGateCurrent) CONTROL_I_Start_Counter = CONTROL_I_Values_Counter;
 			CONTROL_IIGateValues[CONTROL_I_Values_Counter] = MEASURE_DMAExtractIGate();
 			CONTROL_I_Values_Counter++;
 		}
@@ -256,6 +261,7 @@ void CONTROL_IHighPriorityProcess(bool IsGateCurrent)
 		{
 			TIM_Stop(TIM6);
 			TIM_StatusClear(TIM6);
+			if (IsGateCurrent) CONTROL_I_Stop_Counter = CONTROL_I_Values_Counter;
 			CONTROL_SetDeviceState(DS_InProcess, SS_WaitAfterIPulse);
 		}
 	}
@@ -276,27 +282,45 @@ void CONTROL_USetResults(volatile RegulatorParamsStruct* Regulator)
 		for (Int16U i = ++Regulator->ConstantUFirstPulse; i < Regulator->ConstantULastPulse; i++)
 			Result += Regulator->UFormMeasured[i];
 		Result /= (Regulator->ConstantULastPulse - Regulator->ConstantUFirstPulse);
+		DataTable[REG_U_VGS] = (Int16U)Result;
 	}
-	DataTable[REG_U_VGS] = (Int16U)Result;
+	else
+	{
+		CONTROL_SetDeviceWarning(DW_CurrentNotReached);
+		DataTable[REG_U_VGS] = 0;
+	}
 	CONTROL_SetDeviceState(DS_Ready, SS_None);
 }
 //-----------------------------------------------
 
 void CONTROL_ISetResults()
 {
-	float Result;
-	for (Int16U i = 0; i < CONTROL_I_Values_Counter; i++)
-			Result += CONTROL_IIGateValues[i];
-	Result /= CONTROL_I_Values_Counter;
+	if (CONTROL_I_Start_Counter != CONTROL_I_Stop_Counter)
+	{
+		Int16U I_Counter = CONTROL_I_Stop_Counter - CONTROL_I_Start_Counter;
+		float Result;
+		for (Int16U i = CONTROL_I_Start_Counter; i < CONTROL_I_Stop_Counter; i++)
+				Result += CONTROL_IIGateValues[i];
+		Result /= I_Counter;
 
-	float Time = CONTROL_I_Values_Counter * TIMER6_uS;
-	float Qgate = Result * Time;
+		float Time = I_Counter * TIMER6_uS;
+		float Qgate = Result * Time;
 
-	DataTable[REG_I_T_IGATE] = (Int16U)(Time);
-	DataTable[REG_I_AVERAGE_IGATE] = (Int16U)(Result);
-	DataTable[REG_I_QG] = (Int16U)(Qgate);
+		DataTable[REG_I_T_IGATE] = (Int16U)(Time);
+		DataTable[REG_I_AVERAGE_IGATE] = (Int16U)(Result);
+		DataTable[REG_I_QG] = (Int16U)(Qgate);
+	}
+	else
+	{
+		CONTROL_SetDeviceWarning(DW_CurrentNotReached);
+		DataTable[REG_I_T_IGATE] = 0;
+		DataTable[REG_I_AVERAGE_IGATE] = 0;
+		DataTable[REG_I_QG] = 0;
+	}
 
 	CONTROL_I_Values_Counter = 0;
+	CONTROL_I_Start_Counter = 0;
+	CONTROL_I_Stop_Counter = 0;
 	CONTROL_SetDeviceState(DS_Ready, SS_None);
 }
 //-----------------------------------------------
@@ -329,8 +353,10 @@ void CONTROL_IStartProcess()
 {
 	ExDAC_IUCutoff((float)DataTable[REG_I_U_CUTOFF]);
 	ExDAC_IUNegative((float)DataTable[REG_I_U_NEGATIVE]);
-	TIM_Reset(TIM15);
-	TIM_Start(TIM15);
+	CONTROL_I_TimeCounter = 0;
+	TIM_Reset(TIM6);
+	TIM_Start(TIM6);
+	LL_IISetDAC(CU_IIToDAC((float)DataTable[REG_I_I_SET]));
 }
 //-----------------------------------------------
 
@@ -347,6 +373,12 @@ void CONTROL_SetDeviceState(DeviceState NewState, DeviceSubState NewSubState)
 	CONTROL_SubState = NewSubState;
 	DataTable[REG_DEV_STATE] = NewState;
 	DataTable[REG_SUB_STATE] = NewSubState;
+}
+//------------------------------------------
+
+void CONTROL_SetDeviceWarning(DeviceWarning NewWarning)
+{
+	DataTable[REG_WARNING] = NewWarning;
 }
 //------------------------------------------
 

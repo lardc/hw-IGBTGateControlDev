@@ -146,10 +146,10 @@ const TableItemConstraint VConstraint[DATA_TABLE_WP_START - DATA_TABLE_WR_START]
 		{0, 0, 0},																	// 132
 		{0, 0, 0},																	// 133
 		{0, 0, 0},																	// 134
-		{0, 0, 0},																	// 135
-		{0, 0, 0},																	// 136
-		{0, 0, 0},																	// 137
-		{0, 0, 0},																	// 138
+		{I_U_CUTOFF_MIN, I_U_CUTOFF_MAX, I_U_CUTOFF_DEF},							// 135
+		{I_U_NEGATIVE_MIN, I_U_NEGATIVE_MAX, I_U_NEGATIVE_DEF},						// 136
+		{I_I_SET_MIN, I_I_SET_MAX, I_I_SET_MIN},									// 137
+		{I_T_CURRENT_MIN, I_T_CURRENT_MAX, I_T_CURRENT_MIN},						// 138
 		{0, 0, 0},																	// 139
 		{0, 0, 0},																	// 140
 		{0, 0, 0},																	// 141
