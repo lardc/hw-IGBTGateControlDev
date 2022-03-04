@@ -93,7 +93,7 @@ void CONTROL_Init()
 	DEVPROFILE_ResetControlSection();
 	CONTROL_ResetToDefaultState();
 
-	//CU_LoadConvertParams();
+	CU_LoadConvertParams();
 }
 //------------------------------------------
 
@@ -328,7 +328,6 @@ void CONTROL_ISetResults()
 void CONTROL_StartPrepare()
 {
 	MEASURE_DMAIGateBufferClear();
-	CU_LoadConvertParams();
 	REGULATOR_CashVariables(&RegulatorParams);
 	REGULATOR_UFormConfig(&RegulatorParams);
 }

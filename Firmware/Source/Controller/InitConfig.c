@@ -43,12 +43,13 @@ void INITCFG_ConfigIO()
 	GPIO_SetState(GPIO_EXT_DAC_LDAC, true);
 	GPIO_SetState(GPIO_I_START, true);
 	GPIO_SetState(GPIO_LED, false);
-	GPIO_SetState(GPIO_SHORT_OUT, false);
+	GPIO_SetState(GPIO_SHORT_OUT, true);
 
 	// Альтернативные функции
 	GPIO_InitAltFunction(GPIO_ALT_UART1_RX, AltFn_7);
 	GPIO_InitAltFunction(GPIO_ALT_UART1_TX, AltFn_7);
 	GPIO_InitAltFunction(GPIO_ALT_SPI1_CLK, AltFn_5);
+	GPIO_InitAltFunction(GPIO_ALT_SPI1_DAT, AltFn_5);
 }
 //------------------------------------------------
 
@@ -98,7 +99,8 @@ void INITCFG_ConfigADC()
 
 	// ADC1
 	ADC_Calibration(ADC1);
-	ADC_TrigConfig(ADC1, ADC12_TIM6_TRGO, BOTH);
+	ADC_SoftTrigConfig(ADC1);
+	//ADC_TrigConfig(ADC1, ADC12_TIM6_TRGO, BOTH);
 	ADC_ChannelSeqReset(ADC1);
 
 	for (uint8_t i = 1; i <= ADC_DMA_BUFF_SIZE; ++i)

@@ -59,8 +59,9 @@ void LL_ExtDACSendData(Int16U Data)
 {
 	LL_ExtDACSync(false);
 	SPI_WriteByte(SPI1, Data);
-	LL_ExtDACLDAC(false);
 	LL_ExtDACSync(true);
+	LL_ExtDACLDAC(false);
+	DELAY_US(1);
 	LL_ExtDACLDAC(true);
 }
 //-----------------------------

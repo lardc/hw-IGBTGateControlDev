@@ -64,7 +64,7 @@ float CU_IADCIToX(Int16U Data)
 
 void CU_LoadSingleConvertParams(ConvertParams* StructureName, Int16U RegK, Int16U RegP0, Int16U RegP1, Int16U RegP2)
 {
-	StructureName->K = (float)DataTable[RegK];
+	StructureName->K = (float)DataTable[RegK] / 1000;
 	StructureName->P0 = (float)(Int16S)DataTable[RegP0];
 	StructureName->P1 = (float)DataTable[RegP1] / 1000;
 	StructureName->P2 = (RegP2 == 0) ? 0 : (float)((Int16S)DataTable[RegP2]) / 1e6;
@@ -79,36 +79,6 @@ void CU_LoadConvertParams()
 	CU_LoadSingleConvertParams(&IIToDACParams, REG_DAC_I_I_K, REG_DAC_I_I_P0, REG_DAC_I_I_P1, 0);
 	CU_LoadSingleConvertParams(&UCutoffToExtDACParams, REG_EXT_DAC_I_CUTOFF_K, REG_EXT_DAC_I_CUTOFF_P0, REG_EXT_DAC_I_CUTOFF_P1, 0);
 	CU_LoadSingleConvertParams(&UNegativeToExtDACParams, REG_EXT_DAC_I_NEGATIVE_K, REG_EXT_DAC_I_NEGATIVE_P0, REG_EXT_DAC_I_NEGATIVE_P1, 0);
-	/*AdcToUUSenParams.K = (float)DataTable[REG_ADC_U_U_SEN_K];
-	AdcToUUSenParams.P0 = (float)((Int16S)DataTable[REG_ADC_U_U_SEN_P0]);
-	AdcToUUSenParams.P1 = (float)DataTable[REG_ADC_U_U_SEN_P1] / 1000;
-	AdcToUUSenParams.P2 = (float)((Int16S)DataTable[REG_ADC_U_U_SEN_P2]) / 1e6;
-
-	AdcToUISenParams.K = (float)DataTable[REG_ADC_U_I_SEN_K];
-	AdcToUISenParams.P0 = (float)((Int16S)DataTable[REG_ADC_U_I_SEN_P0]);
-	AdcToUISenParams.P1 = (float)DataTable[REG_ADC_U_I_SEN_P1] / 1000;
-	AdcToUISenParams.P2 = (float)((Int16S)DataTable[REG_ADC_U_I_SEN_P2]) / 1e6;
-
-	AdcToIIGateParams.K = (float)DataTable[REG_ADC_I_I_GATE_K];
-	AdcToIIGateParams.P0 = (float)((Int16S)DataTable[REG_ADC_I_I_GATE_P0]);
-	AdcToIIGateParams.P1 = (float)DataTable[REG_ADC_I_I_GATE_P1] / 1000;
-	AdcToIIGateParams.P2 = (float)((Int16S)DataTable[REG_ADC_I_I_GATE_P2]) / 1e6;
-
-	UUToDACParams.K = (float)DataTable[REG_DAC_U_U_K] / 1000;
-	UUToDACParams.P1 = (float)DataTable[REG_DAC_U_U_P1] / 1000;
-	UUToDACParams.P0 = (float)(Int16S)DataTable[REG_DAC_U_U_P0];
-
-	IIToDACParams.K = (float)DataTable[REG_DAC_I_I_K] / 1000;
-	IIToDACParams.P1 = (float)DataTable[REG_DAC_I_I_P1] / 1000;
-	IIToDACParams.P0 = (float)(Int16S)DataTable[REG_DAC_I_I_P0];
-
-	UCutoffToExtDACParams.K = (float)DataTable[REG_EXT_DAC_I_CUTOFF_K] / 1000;
-	UCutoffToExtDACParams.P1 = (float)DataTable[REG_EXT_DAC_I_CUTOFF_P1] / 1000;
-	UCutoffToExtDACParams.P0 = (float)(Int16S)DataTable[REG_EXT_DAC_I_CUTOFF_P0];
-
-	UNegativeToExtDACParams.K = (float)DataTable[REG_EXT_DAC_I_NEGATIVE_K] / 1000;
-	UNegativeToExtDACParams.P1 = (float)DataTable[REG_EXT_DAC_I_NEGATIVE_P1] / 1000;
-	UNegativeToExtDACParams.P0 = (float)(Int16S)DataTable[REG_EXT_DAC_I_NEGATIVE_P0];*/
 }
 //-----------------------------
 

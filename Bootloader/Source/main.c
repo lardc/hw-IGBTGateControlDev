@@ -62,7 +62,7 @@ void ConfigGPIO()
 	GPIO_Bit_Rst(EXT_DAC_PORT, EXT_DAC_LDAC);
 	GPIO_Config(EXT_DAC_PORT, EXT_DAC_DATA, Output, PushPull, HighSpeed, NoPull);
 	GPIO_Bit_Rst(EXT_DAC_PORT, EXT_DAC_DATA);
-	GPIO_Config(EXT_DAC_PORT, EXT_DAC_CLK, Output, PushPull, HighSpeed, NoPull);
+	GPIO_Config(EXT_DAC_CLK_PORT, EXT_DAC_CLK, Output, PushPull, HighSpeed, NoPull);
 	GPIO_Bit_Rst(EXT_DAC_PORT, EXT_DAC_CLK);
 	//
 	GPIO_Config(A_SET_PORT, A_SET_I, Output, PushPull, HighSpeed, NoPull);

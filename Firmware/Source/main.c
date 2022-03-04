@@ -17,6 +17,9 @@ int main()
 	// Настройка UART
 	INITCFG_ConfigUART();
 	
+	// Настройка SPI внешнего ЦАП
+	INITCFG_ConfigSPI();
+
 	// Настройка системного счетчика
 	INITCFG_ConfigTimer7();
 	
