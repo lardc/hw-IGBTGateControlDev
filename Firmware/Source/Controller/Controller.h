@@ -15,31 +15,40 @@ typedef enum __DeviceState
 	DS_Fault = 1,
 	DS_Disabled = 2,
 	DS_Ready = 3,
-	DS_ConfigReady = 4,
-	DS_InProcess = 5
+	DS_InProcess = 4
 } DeviceState;
 
 typedef enum __DeviceSubState
 {
 	SS_None = 0,
-	SS_PowerPrepare = 1,
-	SS_PulsePrepare = 2,
-	SS_WaitAfterPulse = 3,
-	SS_Pulse = 4
+	SS_PulsePrepare = 1,
+	SS_Pulse = 2,
+	SS_WaitAfterUPulse = 3,
+	SS_WaitAfterIPulse = 4
 } DeviceSubState;
+
+typedef enum __DeviceWarning
+{
+	DW_None = 0,
+	DW_CurrentNotReached = 1
+} DeviceWarning;
 
 // Variables
 //
 extern volatile DeviceState CONTROL_State;
 extern volatile Int64U CONTROL_TimeCounter;
+extern volatile Int64U CONTROL_I_TimeCounter;
 extern Int64U CONTROL_LEDTimeout;
 extern volatile Int16U CONTROL_Values_Counter;
+extern volatile Int16U CONTROL_I_Values_Counter;
 extern volatile Int16U CONTROL_RegulatorErr_Counter;
-/*extern volatile Int16U CONTROL_ValuesCurrent[VALUES_x_SIZE];
-extern volatile Int16U CONTROL_RegulatorErr[VALUES_x_SIZE];
-extern volatile Int16U CONTROL_ValuesBatteryVoltage[VALUES_x_SIZE];
-extern volatile Int16U CONTROL_RegulatorOutput[VALUES_x_SIZE];
-extern volatile Int16U CONTROL_DACRawData[VALUES_x_SIZE];*/
+extern volatile Int16U CONTROL_UUValues[];
+extern volatile Int16U CONTROL_UUMeasValues[];
+extern volatile Int16U CONTROL_RegulatorOutput[];
+extern volatile Int16U CONTROL_RegulatorErr[];
+extern volatile Int16U CONTROL_DACRawData[];
+extern volatile Int16U CONTROL_UIMeasValues[];
+extern volatile Int16U CONTROL_IIGateValues[];
 //
 extern volatile RegulatorParamsStruct RegulatorParams;
 
@@ -49,13 +58,16 @@ extern volatile RegulatorParamsStruct RegulatorParams;
 void CONTROL_Init();
 void CONTROL_Idle();
 void CONTROL_SetDeviceState(DeviceState NewState, DeviceSubState NewSubState);
+void CONTROL_SetDeviceWarning(DeviceWarning NewWarning);
 void CONTROL_DelayMs(uint32_t Delay);
-void CONTROL_HighPriorityProcess();
+void CONTROL_UHighPriorityProcess();
+void CONTROL_IHighPriorityProcess(bool IsInProgress, bool IsGateCurrent);
 void CONTROL_ExternalInterruptProcess();
-void CONTROL_SineConfig(volatile RegulatorParamsStruct* Regulator);
-void CONTROL_LinearConfig(volatile RegulatorParamsStruct* Regulator);
-void CONTROL_CopyCurrentToEP(volatile RegulatorParamsStruct* Regulator);
-void CONTROL_StartProcess();
-void CONTROL_HandleFanLogic(bool IsImpulse);
+void CONTROL_UStartProcess();
+void CONTROL_IStartProcess();
+void CONTROL_USetResults(volatile RegulatorParamsStruct* Regulator);
+void CONTROL_ISetResults();
+void CONTROL_UStartProcess();
+void CONTROL_UStopProcess();
 
 #endif // __CONTROLLER_H

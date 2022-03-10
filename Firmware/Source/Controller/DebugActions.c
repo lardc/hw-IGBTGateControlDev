@@ -20,13 +20,13 @@
 //
 void DBGACT_UUSet()
 {
-	LL_UUSetDAC(CU_UToDAC((float)DataTable[REG_DBG]));
+	LL_UUSetDAC(CU_UUToDAC((float)DataTable[REG_DBG]));
 }
 //-----------------------------
 
 void DBGACT_UShortOut()
 {
-	DataTable[REG_DBG] == 0 ? LL_UShortOut(false) : LL_UShortOut(true);
+	DataTable[REG_DBG] == 1 ? LL_UShortOut(false) : LL_UShortOut(true);
 }
 //-----------------------------
 
@@ -46,13 +46,13 @@ void DBGACT_UISen()
 //
 void DBGACT_IISet()
 {
-	LL_IISetDAC(CU_UToDAC((float)DataTable[REG_DBG]));
+	LL_IISetDAC(CU_IIToDAC((float)DataTable[REG_DBG]));
 }
 //-----------------------------
 
 void DBGACT_IStart()
 {
-	DataTable[REG_DBG] == 0 ? LL_IStart(false) : LL_IStart(true);
+	DataTable[REG_DBG] == 1 ? LL_IStart(false) : LL_IStart(true);
 }
 //-----------------------------
 

@@ -14,12 +14,12 @@ Int16U REGULATOR_DACApplyLimits(float Value, Int16U Offset, Int16U LimitValue);
 //
 bool REGULATOR_Process(volatile RegulatorParamsStruct* Regulator)
 {
-	/*static float Qi = 0, Qp;
+	static float Qi = 0, Qp;
 
-	Regulator->RegulatorError = (Regulator->RegulatorPulseCounter == 0) ? 0 : (Regulator->CurrentTable[Regulator->RegulatorPulseCounter] - Regulator->MeasuredCurrent);
+	Regulator->RegulatorError = (Regulator->RegulatorPulseCounter == 0) ? 0 : (Regulator->UFormTable[Regulator->RegulatorPulseCounter] - Regulator->UMeasured);
 
-	Qp = Regulator->RegulatorError * Regulator->Kp[Regulator->CurrentRange];
-	Qi += Regulator->RegulatorError * (Regulator->Ki[Regulator->CurrentRange] + Regulator->KiTune[Regulator->CurrentRange]);
+	Qp = Regulator->RegulatorError * Regulator->Kp;
+	Qi += Regulator->RegulatorError * (Regulator->Ki + Regulator->KiTune);
 
 	float Qi_max = (float)DataTable[REG_REGULATOR_QI_MAX];
 	if(Qi > Qi_max)
@@ -27,20 +27,21 @@ bool REGULATOR_Process(volatile RegulatorParamsStruct* Regulator)
 	else if (Qi < -Qi_max)
 		Qi = -Qi_max;
 
-	Regulator->RegulatorOutput = Regulator->CurrentTable[Regulator->RegulatorPulseCounter] + Qp + Qi;
+	Regulator->RegulatorOutput = Regulator->UFormTable[Regulator->RegulatorPulseCounter] + Qp + Qi;
 
 	// Выбор источника данных для записи в ЦАП
 	float ValueToDAC;
 	if(Regulator->DebugMode)
-		ValueToDAC = Regulator->CurrentTable[Regulator->RegulatorPulseCounter];
+		ValueToDAC = Regulator->UFormTable[Regulator->RegulatorPulseCounter];
 	else
-		ValueToDAC = CU_ItoDAC(Regulator->RegulatorOutput, Regulator->CurrentRange);
+		ValueToDAC = Regulator->RegulatorOutput;
 
 	// Проверка границ диапазона ЦАП
 	Regulator->DACSetpoint = REGULATOR_DACApplyLimits(ValueToDAC, Regulator->DACOffset, Regulator->DACLimitValue);
-	LL_WriteDAC(Regulator->DACSetpoint);
+	LL_UUSetDAC(Regulator->DACSetpoint);
 
-	REGULATOR_LoggingData(Regulator);
+	if(DataTable[REG_REGULATOR_LOGGING] == 1)
+		REGULATOR_LoggingData(Regulator);
 	Regulator->RegulatorPulseCounter++;
 	if(Regulator->RegulatorPulseCounter >= PULSE_BUFFER_SIZE)
 	{
@@ -49,7 +50,7 @@ bool REGULATOR_Process(volatile RegulatorParamsStruct* Regulator)
 		Qi = 0;
 		return true;
 	}
-	else*/
+	else
 		return false;
 }
 //-----------------------------------------------
@@ -68,7 +69,7 @@ Int16U REGULATOR_DACApplyLimits(float Value, Int16U Offset, Int16U LimitValue)
 
 void REGULATOR_LoggingData(volatile RegulatorParamsStruct* Regulator)
 {
-	/*static Int16U ScopeLogStep = 0, LocalCounter = 0;
+	static Int16U ScopeLogStep = 0, LocalCounter = 0;
 
 	// Сброс локального счетчика в начале логгирования
 	if (CONTROL_Values_Counter == 0)
@@ -78,10 +79,11 @@ void REGULATOR_LoggingData(volatile RegulatorParamsStruct* Regulator)
 	{
 		ScopeLogStep = 0;
 
-		CONTROL_ValuesCurrent[LocalCounter] = (Int16U)(Regulator->MeasuredCurrent);
+		CONTROL_UUValues[LocalCounter] = (Int16U)(Regulator->UTarget);
+		CONTROL_UUMeasValues[LocalCounter] = (Int16U)(Regulator->UMeasured);
+		CONTROL_UIMeasValues[LocalCounter] = (Int16U)(Regulator->IFormMeasured[Regulator->RegulatorPulseCounter]);
 		CONTROL_RegulatorErr[LocalCounter] = (Int16S)(Regulator->RegulatorError);
 		CONTROL_RegulatorOutput[LocalCounter] = (Int16S)(Regulator->RegulatorOutput);
-		CONTROL_ValuesBatteryVoltage[LocalCounter] = (Int16U)(Regulator->MeasuredBatteryVoltage * 10);
 		CONTROL_DACRawData[LocalCounter] = (Int16U)(Regulator->DACSetpoint);
 
 		CONTROL_Values_Counter = LocalCounter;
@@ -90,31 +92,42 @@ void REGULATOR_LoggingData(volatile RegulatorParamsStruct* Regulator)
 	}
 
 	// Условие обновления глобального счетчика данных
-	if (CONTROL_Values_Counter < VALUES_x_SIZE)
+	if (CONTROL_Values_Counter < U_VALUES_x_SIZE)
 		CONTROL_Values_Counter = LocalCounter;
 
 	// Сброс локального счетчика
-	if (LocalCounter >= VALUES_x_SIZE)
-		LocalCounter = 0;*/
+	if (LocalCounter >= U_VALUES_x_SIZE)
+		LocalCounter = 0;
+}
+//-----------------------------------------------
+
+void REGULATOR_UFormConfig(volatile RegulatorParamsStruct* Regulator)
+{
+	Int16U UFrontLastPulse = (Int16U)((float)DataTable[REG_U_T_UFRONT] / PULSE_PERIOD);
+	for (Int16U i = 0; i < PULSE_BUFFER_SIZE; i++)
+		Regulator->UFormTable[i] = i < UFrontLastPulse ?  (float)((DataTable[REG_U_UMAX] * i) / DataTable[REG_U_T_UFRONT]) : 0;
+}
+//-----------------------------------------------
+
+void REGULATOR_UFormUpdate (volatile RegulatorParamsStruct* Regulator)
+{
+	Regulator->ConstantUFirstPulse = Regulator->RegulatorPulseCounter;
+	Regulator->ConstantULastPulse = Regulator->RegulatorPulseCounter + (Int16U)((float)DataTable[REG_U_T_UCONSTANT] / PULSE_PERIOD);
+	if (Regulator->ConstantULastPulse > PULSE_BUFFER_SIZE)
+		Regulator->ConstantULastPulse = PULSE_BUFFER_SIZE;
+	for (Int16U i = Regulator->RegulatorPulseCounter; i < PULSE_BUFFER_SIZE; i++)
+		Regulator->UFormTable[i] = i < Regulator->ConstantULastPulse ? Regulator->UFormTable[Regulator->RegulatorPulseCounter] : 0;
 }
 //-----------------------------------------------
 
 void REGULATOR_CashVariables(volatile RegulatorParamsStruct* Regulator)
 {
-	/*float CurrentMax = (float)DataTable[REG_CURRENT_PER_CURBOARD] / 10 * DataTable[REG_CURBOARD_QUANTITY];
-	float CurrentTarget = (float)DataTable[REG_CURRENT_PULSE_VALUE] / 10;
-
-	// Кеширование коэффициентов регулятора
-	for(int i = 0; i < CURRENT_RANGE_QUANTITY; i++)
-	{
-		Regulator->Kp[i] = (float)DataTable[REG_REGULATOR_RANGE0_Kp + i * 2] / 1000;
-		Regulator->Ki[i] = (float)DataTable[REG_REGULATOR_RANGE0_Ki + i * 2] / 1000;
-		Regulator->KiTune[i] = (CurrentMax - CurrentTarget) * (float)DataTable[REG_REGULATOR_TF_Ki_RANG0 + i] / 1e6;
-	}
-
+	Regulator->Kp = (float)DataTable[REG_REGULATOR_Kp] / 1000;
+	Regulator->Ki = (float)DataTable[REG_REGULATOR_Ki] / 1000;
+	Regulator->KiTune = (float)DataTable[REG_REGULATOR_TF_Ki] / 1e6;
 	Regulator->DebugMode = false;
 	Regulator->DACOffset = DataTable[REG_DAC_OFFSET];
 	Regulator->DACLimitValue = (DAC_MAX_VAL > DataTable[REG_DAC_OUTPUT_LIMIT_VALUE]) ? \
-			DataTable[REG_DAC_OUTPUT_LIMIT_VALUE] : DAC_MAX_VAL;*/
+			DataTable[REG_DAC_OUTPUT_LIMIT_VALUE] : DAC_MAX_VAL;
 }
 //-----------------------------------------------

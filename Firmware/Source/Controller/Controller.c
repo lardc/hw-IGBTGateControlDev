@@ -3,7 +3,6 @@
 //
 // Includes
 #include "Board.h"
-#include "Delay.h"
 #include "DeviceProfile.h"
 #include "Interrupts.h"
 #include "LowLevel.h"
@@ -13,6 +12,7 @@
 #include "BCCIxParams.h"
 #include "Measurement.h"
 #include "math.h"
+#include "ExternalDAC.h"
 
 // Types
 //
@@ -25,22 +25,27 @@ volatile DeviceSubState CONTROL_SubState = SS_None;
 static Boolean CycleActive = false;
 //
 volatile Int64U CONTROL_TimeCounter = 0;
+volatile Int64U CONTROL_I_TimeCounter = 0;
+volatile Int64U CONTROL_I_Start_Counter = 0;
+volatile Int64U CONTROL_I_Stop_Counter = 0;
+//
 volatile Int64U	CONTROL_AfterPulsePause = 0;
 volatile Int64U	CONTROL_BatteryChargeTimeCounter = 0;
 volatile Int64U CONTROL_ConfigStateCounter = 0;
 volatile Int16U CONTROL_Values_Counter = 0;
-/*volatile Int16U CONTROL_ValuesCurrent[VALUES_x_SIZE];
-volatile Int16U CONTROL_RegulatorErr[VALUES_x_SIZE];
-volatile Int16U CONTROL_ValuesBatteryVoltage[VALUES_x_SIZE];
-volatile Int16U CONTROL_RegulatorOutput[VALUES_x_SIZE];
-volatile Int16U CONTROL_CurentTable[VALUES_x_SIZE];
-volatile Int16U CONTROL_DACRawData[VALUES_x_SIZE];*/
+volatile Int16U CONTROL_I_Values_Counter = 0;
+volatile Int16U CONTROL_UUValues[U_VALUES_x_SIZE];
+volatile Int16U CONTROL_UUMeasValues[U_VALUES_x_SIZE];
+volatile Int16U CONTROL_RegulatorOutput[U_VALUES_x_SIZE];
+volatile Int16U CONTROL_RegulatorErr[U_VALUES_x_SIZE];
+volatile Int16U CONTROL_DACRawData[U_VALUES_x_SIZE];
+volatile Int16U CONTROL_UIMeasValues[U_VALUES_x_SIZE];
+volatile Int16U CONTROL_IIGateValues[I_VALUES_x_SIZE];
 //
 float CONTROL_CurrentMaxValue = 0;
 //
 volatile RegulatorParamsStruct RegulatorParams;
 static FUNC_AsyncDelegate LowPriorityHandle = NULL;
-
 /// Forward functions
 //
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError);
@@ -61,19 +66,19 @@ bool CONTROL_BatteryVoltageCheck();
 void CONTROL_Init()
 {
 	// Переменные для конфигурации EndPoint
-	/*Int16U EPIndexes[EP_COUNT] = {EP_CURRENT, EP_BATTERY_VOLTAGE, EP_REGULATOR_OUTPUT, EP_REGULATOR_ERR, EP_CUR_TABLE,
-			EP_DAC_RAW_DATA};
+	Int16U EPIndexes[EP_COUNT] = {EP_U_U_FORM, EP_U_U_MEAS_FORM, EP_REGULATOR_OUTPUT, EP_REGULATOR_ERR, EP_U_DAC_RAW_DATA,
+			EP_U_I_MEAS_FORM, EP_I_I_GATE_FORM};
 
 	Int16U EPSized[EP_COUNT] =
-			{VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE};
+			{U_VALUES_x_SIZE, U_VALUES_x_SIZE, U_VALUES_x_SIZE, U_VALUES_x_SIZE, U_VALUES_x_SIZE, U_VALUES_x_SIZE, I_VALUES_x_SIZE};
 
 	pInt16U EPCounters[EP_COUNT] = {(pInt16U)&CONTROL_Values_Counter, (pInt16U)&CONTROL_Values_Counter,
 			(pInt16U)&CONTROL_Values_Counter, (pInt16U)&CONTROL_Values_Counter, (pInt16U)&CONTROL_Values_Counter,
-			(pInt16U)&CONTROL_Values_Counter};
+			(pInt16U)&CONTROL_Values_Counter, (pInt16U)&CONTROL_I_Values_Counter};
 
-	pInt16U EPDatas[EP_COUNT] = {(pInt16U)CONTROL_ValuesCurrent, (pInt16U)CONTROL_ValuesBatteryVoltage,
-			(pInt16U)CONTROL_RegulatorOutput, (pInt16U)CONTROL_RegulatorErr, (pInt16U)CONTROL_CurentTable,
-			(pInt16U)CONTROL_DACRawData};*/
+	pInt16U EPDatas[EP_COUNT] = {(pInt16U)CONTROL_UUValues, (pInt16U)CONTROL_UUMeasValues,
+			(pInt16U)CONTROL_RegulatorOutput, (pInt16U)CONTROL_RegulatorErr, (pInt16U)CONTROL_DACRawData,
+			(pInt16U)CONTROL_UIMeasValues, (pInt16U)CONTROL_IIGateValues};
 
 	// Конфигурация сервиса работы Data-table и EPROM
 	EPROMServiceConfig EPROMService = {(FUNC_EPROM_WriteValues)&NFLASH_WriteDT, (FUNC_EPROM_ReadValues)&NFLASH_ReadDT};
@@ -83,38 +88,33 @@ void CONTROL_Init()
 
 	// Инициализация device profile
 	DEVPROFILE_Init(&CONTROL_DispatchAction, &CycleActive);
-	//DEVPROFILE_InitEPService(EPIndexes, EPSized, EPCounters, EPDatas);
+	DEVPROFILE_InitEPService(EPIndexes, EPSized, EPCounters, EPDatas);
 	// Сброс значений
 	DEVPROFILE_ResetControlSection();
 	CONTROL_ResetToDefaultState();
 
-	//CU_LoadConvertParams();
+	CU_LoadConvertParams();
 }
 //------------------------------------------
 
 void CONTROL_ResetOutputRegisters()
 {
-	/*DataTable[REG_FAULT_REASON] = DF_NONE;
+	DataTable[REG_FAULT_REASON] = DF_NONE;
 	DataTable[REG_DISABLE_REASON] = DF_NONE;
 	DataTable[REG_WARNING] = WARNING_NONE;
 	DataTable[REG_PROBLEM] = PROBLEM_NONE;
 	DataTable[REG_OP_RESULT] = OPRESULT_NONE;
-	
-	DataTable[REG_RESULT_CURRENT] = 0;
 
 	DEVPROFILE_ResetScopes(0);
-	DEVPROFILE_ResetEPReadState();*/
+	DEVPROFILE_ResetEPReadState();
 }
 //------------------------------------------
 
 void CONTROL_ResetToDefaultState()
 {
-	/*CONTROL_ResetOutputRegisters();
-	
-	LL_LSLCurrentBoardLock(true);
-	LL_PowerSupplyEnable(false);
-
-	CONTROL_SetDeviceState(DS_None, SS_None);*/
+	CONTROL_ResetOutputRegisters();
+	LL_UShortOut(true);
+	CONTROL_SetDeviceState(DS_None, SS_None);
 }
 //------------------------------------------
 
@@ -140,57 +140,52 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 	switch (ActionID)
 	{
 		case ACT_ENABLE_POWER:
-			/*if(CONTROL_State == DS_None)
-			{
-				CONTROL_BatteryChargeTimeCounter = CONTROL_TimeCounter + DataTable[REG_BATTERY_FULL_CHRAGE_TIMEOUT];
-				CONTROL_SetDeviceState(DS_InProcess, SS_PowerPrepare);
-				LL_PowerSupplyEnable(true);
-			}
+			if(CONTROL_State == DS_None)
+				CONTROL_SetDeviceState(DS_Ready, SS_None);
 			else if(CONTROL_State != DS_Ready)
-				*pUserError = ERR_OPERATION_BLOCKED;*/
+				*pUserError = ERR_OPERATION_BLOCKED;
 			break;
 
 		case ACT_DISABLE_POWER:
-			/*if((CONTROL_State == DS_Ready) || ((CONTROL_State == DS_InProcess) && (CONTROL_SubState == SS_PowerPrepare)))
-			{
+			if((CONTROL_State == DS_Ready) || (CONTROL_State == DS_InProcess))
 				CONTROL_ResetToDefaultState();
-			}
 			else if(CONTROL_State != DS_None)
-					*pUserError = ERR_OPERATION_BLOCKED;*/
+					*pUserError = ERR_OPERATION_BLOCKED;
 			break;
 
-		case ACT_U_START:
-			/*if (CONTROL_State == DS_ConfigReady)
+		case ACT_VGS_START:
+			if (CONTROL_State == DS_Ready)
 			{
-				CONTROL_SetDeviceState(DS_InProcess, SS_Pulse);
-				CONTROL_StartProcess();
+				CONTROL_SetDeviceState(DS_InProcess, SS_PulsePrepare);
+				CONTROL_UStartProcess();
 			}
 			else
 				if (CONTROL_State == DS_InProcess)
 					*pUserError = ERR_OPERATION_BLOCKED;
 				else
-					*pUserError = ERR_DEVICE_NOT_READY;*/
+					*pUserError = ERR_DEVICE_NOT_READY;
 			break;
 
 		case ACT_QG_START:
-			/*if (CONTROL_State == DS_ConfigReady)
+			if (CONTROL_State == DS_Ready)
 			{
 				CONTROL_SetDeviceState(DS_InProcess, SS_Pulse);
-				CONTROL_StartProcess();
+				CONTROL_IStartProcess();
 			}
 			else
 				if (CONTROL_State == DS_InProcess)
 					*pUserError = ERR_OPERATION_BLOCKED;
 				else
-					*pUserError = ERR_DEVICE_NOT_READY;*/
+					*pUserError = ERR_DEVICE_NOT_READY;
 			break;
 
 		case ACT_STOP_PROCESS:
-			/*if (CONTROL_State == DS_InProcess)
+			if (CONTROL_State == DS_InProcess)
 			{
-				CONTROL_StopProcess();
+				CONTROL_UStopProcess();
+				//CONTROL_IStopProcess();
 				CONTROL_SetDeviceState(DS_Ready, SS_None);
-			}*/
+			}
 			break;
 
 		case ACT_CLR_FAULT:
@@ -215,66 +210,61 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 
 void CONTROL_LogicProcess()
 {
-	/*switch(CONTROL_SubState)
+	switch(CONTROL_SubState)
 	{
-		case SS_PowerPrepare:
-			if(CONTROL_BatteryVoltageCheck())
-				CONTROL_SetDeviceState(DS_Ready, SS_None);
-			else
-			{
-				if(CONTROL_TimeCounter >= CONTROL_BatteryChargeTimeCounter)
-				{
-					CONTROL_ResetToDefaultState();
-					CONTROL_SwitchToFault(PROBLEM_BATTERY);
-				}
-			}
-			break;
-
 		case SS_PulsePrepare:
 			CONTROL_StartPrepare();
-			CONTROL_SetDeviceState(DS_ConfigReady, SS_None);
+			CONTROL_SetDeviceState(DS_Ready, SS_Pulse);
 			break;
 
-		case SS_WaitAfterPulse:
-			if(CONTROL_TimeCounter > CONTROL_AfterPulsePause)
-			{
-				if(CONTROL_BatteryVoltageCheck())
-					CONTROL_SetDeviceState(DS_Ready, SS_None);
-				else
-				{
-					if(CONTROL_TimeCounter >= CONTROL_BatteryChargeTimeCounter)
-					{
-						CONTROL_ResetToDefaultState();
-						CONTROL_SwitchToFault(PROBLEM_BATTERY);
-					}
-				}
-			}
+		case SS_WaitAfterUPulse:
+			CONTROL_USetResults(&RegulatorParams);
+			break;
+
+		case SS_WaitAfterIPulse:
+			CONTROL_ISetResults(&RegulatorParams);
 			break;
 
 		default:
-			CONTROL_BatteryVoltageCheck();
-
-			if((CONTROL_State == DS_ConfigReady) && (CONTROL_TimeCounter >= CONTROL_ConfigStateCounter))
-				CONTROL_SetDeviceState(DS_Ready, SS_None);
 			break;
-	}*/
+	}
 }
 //-----------------------------------------------
 
-
-void CONTROL_HighPriorityProcess()
+void CONTROL_UHighPriorityProcess()
 {
-	/*if(CONTROL_SubState == SS_Pulse)
+	if(CONTROL_SubState == SS_Pulse)
 	{
-		MEASURE_SampleParams(&RegulatorParams);
+		if (MEASURE_UParams(&RegulatorParams))
+			REGULATOR_UFormUpdate(&RegulatorParams);
 
 		if(CONTROL_RegulatorCycle(&RegulatorParams))
 		{
-			CONTROL_StopProcess();
-			CONTROL_SetDeviceState(DS_InProcess, SS_WaitAfterPulse);
-			DataTable[REG_OP_RESULT] = OPRESULT_OK;
+			CONTROL_UStopProcess();
+			CONTROL_SetDeviceState(DS_InProcess, SS_WaitAfterUPulse);
 		}
-	}*/
+	}
+}
+//-----------------------------------------------
+
+void CONTROL_IHighPriorityProcess(bool IsInProgress, bool IsGateCurrent)
+{
+	if(CONTROL_SubState == SS_Pulse)
+	{
+		if (IsInProgress)
+		{
+			if (IsGateCurrent) CONTROL_I_Start_Counter = CONTROL_I_Values_Counter;
+			CONTROL_IIGateValues[CONTROL_I_Values_Counter] = MEASURE_DMAExtractIGate();
+			CONTROL_I_Values_Counter++;
+		}
+		else
+		{
+			TIM_Stop(TIM6);
+			TIM_StatusClear(TIM6);
+			if (IsGateCurrent) CONTROL_I_Stop_Counter = CONTROL_I_Values_Counter;
+			CONTROL_SetDeviceState(DS_InProcess, SS_WaitAfterIPulse);
+		}
+	}
 }
 //-----------------------------------------------
 
@@ -284,59 +274,90 @@ bool CONTROL_RegulatorCycle(volatile RegulatorParamsStruct* Regulator)
 }
 //-----------------------------------------------
 
+void CONTROL_USetResults(volatile RegulatorParamsStruct* Regulator)
+{
+	float Result = Regulator->UFormMeasured[Regulator->ConstantUFirstPulse];
+	if ((Regulator->ConstantUFirstPulse) != (Regulator->ConstantULastPulse))
+	{
+		for (Int16U i = ++Regulator->ConstantUFirstPulse; i < Regulator->ConstantULastPulse; i++)
+			Result += Regulator->UFormMeasured[i];
+		Result /= (Regulator->ConstantULastPulse - Regulator->ConstantUFirstPulse);
+		DataTable[REG_U_VGS] = (Int16U)Result;
+	}
+	else
+	{
+		CONTROL_SetDeviceWarning(DW_CurrentNotReached);
+		DataTable[REG_U_VGS] = 0;
+	}
+	CONTROL_SetDeviceState(DS_Ready, SS_None);
+}
+//-----------------------------------------------
+
+void CONTROL_ISetResults()
+{
+	if (CONTROL_I_Start_Counter != CONTROL_I_Stop_Counter)
+	{
+		Int16U I_Counter = CONTROL_I_Stop_Counter - CONTROL_I_Start_Counter;
+		float Result;
+		for (Int16U i = CONTROL_I_Start_Counter; i < CONTROL_I_Stop_Counter; i++)
+				Result += CONTROL_IIGateValues[i];
+		Result /= I_Counter;
+
+		float Time = I_Counter * TIMER6_uS;
+		float Qgate = Result * Time;
+
+		DataTable[REG_I_T_IGATE] = (Int16U)(Time);
+		DataTable[REG_I_AVERAGE_IGATE] = (Int16U)(Result);
+		DataTable[REG_I_QG] = (Int16U)(Qgate);
+	}
+	else
+	{
+		CONTROL_SetDeviceWarning(DW_CurrentNotReached);
+		DataTable[REG_I_T_IGATE] = 0;
+		DataTable[REG_I_AVERAGE_IGATE] = 0;
+		DataTable[REG_I_QG] = 0;
+	}
+
+	CONTROL_I_Values_Counter = 0;
+	CONTROL_I_Start_Counter = 0;
+	CONTROL_I_Stop_Counter = 0;
+	CONTROL_SetDeviceState(DS_Ready, SS_None);
+}
+//-----------------------------------------------
+
 void CONTROL_StartPrepare()
 {
-	/*MEASURE_DMABufferClear();
-	CU_LoadConvertParams();
+	MEASURE_DMAIGateBufferClear();
 	REGULATOR_CashVariables(&RegulatorParams);
-	CONTROL_CashVariables();
-	CONTROL_SineConfig(&RegulatorParams);
-	CONTROL_LinearConfig(&RegulatorParams);
-	CONTROL_CopyCurrentToEP(&RegulatorParams);
-
-	MEASURE_SetCurrentRange(&RegulatorParams);*/
+	REGULATOR_UFormConfig(&RegulatorParams);
 }
 //-----------------------------------------------
 
-void CONTROL_CashVariables()
+void CONTROL_UStopProcess()
 {
-	/*RegulatorParams.CurrentTarget = (float)DataTable[REG_CURRENT_PULSE_VALUE] / 10;
-
-	CONTROL_CurrentMaxValue = (float)DataTable[REG_CURRENT_PER_CURBOARD] / 10 * DataTable[REG_CURBOARD_QUANTITY];
-	if(RegulatorParams.CurrentTarget > CONTROL_CurrentMaxValue)
-		RegulatorParams.CurrentTarget = CONTROL_CurrentMaxValue;*/
-}
-//-----------------------------------------------
-
-
-void CONTROL_CopyCurrentToEP(volatile RegulatorParamsStruct* Regulator)
-{
-	/*for(int i = 0; i < PULSE_BUFFER_SIZE; ++i)
-		CONTROL_CurentTable[i] = (Int16S)Regulator->CurrentTable[i];*/
-}
-//-----------------------------------------------
-
-void CONTROL_StopProcess()
-{
-	/*TIM_Stop(TIM15);
-	LowPriorityHandle = &CONTROL_PostPulseSlowSequence;
-
-	float AfterPulseCoefficient = RegulatorParams.CurrentTarget / CONTROL_CurrentMaxValue;
-	CONTROL_AfterPulsePause = CONTROL_TimeCounter + DataTable[REG_AFTER_PULSE_PAUSE] * AfterPulseCoefficient;
-	CONTROL_BatteryChargeTimeCounter = CONTROL_TimeCounter + DataTable[REG_BATTERY_RECHARGE_TIMEOUT];*/
+	TIM_Stop(TIM15);
+	LL_UShortOut(true);
 }
 //------------------------------------------
 
-void CONTROL_StartProcess()
+void CONTROL_UStartProcess()
 {
-	/*CONTROL_HandleFanLogic(true);
-
-	LL_LSLCurrentBoardLock(false);
+	LL_UShortOut(false);
 	TIM_Reset(TIM15);
-	TIM_Start(TIM15);*/
+	TIM_Start(TIM15);
 }
 //-----------------------------------------------
 
+void CONTROL_IStartProcess()
+{
+	ExDAC_IUCutoff((float)DataTable[REG_I_U_CUTOFF]);
+	ExDAC_IUNegative((float)DataTable[REG_I_U_NEGATIVE]);
+	CONTROL_I_TimeCounter = 0;
+	TIM_Reset(TIM6);
+	TIM_Start(TIM6);
+	LL_IISetDAC(CU_IIToDAC((float)DataTable[REG_I_I_SET]));
+}
+//-----------------------------------------------
 
 void CONTROL_SwitchToFault(Int16U Reason)
 {
@@ -351,6 +372,12 @@ void CONTROL_SetDeviceState(DeviceState NewState, DeviceSubState NewSubState)
 	CONTROL_SubState = NewSubState;
 	DataTable[REG_DEV_STATE] = NewState;
 	DataTable[REG_SUB_STATE] = NewSubState;
+}
+//------------------------------------------
+
+void CONTROL_SetDeviceWarning(DeviceWarning NewWarning)
+{
+	DataTable[REG_WARNING] = NewWarning;
 }
 //------------------------------------------
 

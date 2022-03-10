@@ -25,9 +25,9 @@ void LL_IStart(bool State)
 }
 //-----------------------------
 
-void LL_ICompState()
+bool LL_ICompState()
 {
-	GPIO_GetState(GPIO_I_COMP);
+	return GPIO_GetState(GPIO_I_COMP);
 }
 //-----------------------------
 
@@ -59,8 +59,9 @@ void LL_ExtDACSendData(Int16U Data)
 {
 	LL_ExtDACSync(false);
 	SPI_WriteByte(SPI1, Data);
-	LL_ExtDACLDAC(false);
 	LL_ExtDACSync(true);
+	LL_ExtDACLDAC(false);
+	DELAY_US(1);
 	LL_ExtDACLDAC(true);
 }
 //-----------------------------

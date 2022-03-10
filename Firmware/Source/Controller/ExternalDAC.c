@@ -12,7 +12,6 @@
 void ExDAC_IUCutoff(float Value)
 {
 	Int16U Data = CU_UCutoffToExtDAC(Value);
-	Data |= EXT_DAC_A;
 	LL_ExtDACSendData(Data);
 }
 //-----------------------------

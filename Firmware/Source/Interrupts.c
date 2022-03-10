@@ -33,8 +33,11 @@ void USB_LP_CAN_RX0_IRQHandler()
 
 void EXTI15_10_IRQHandler(void)
 {
-
 	EXTI_FlagReset(EXTI_15);
+	if (LL_ICompState())
+		CONTROL_IHighPriorityProcess(true, true);
+	else
+		CONTROL_IHighPriorityProcess(false, true);
 }
 //-----------------------------------------------
 
@@ -42,9 +45,22 @@ void TIM15_IRQHandler()
 {
 	if(TIM_StatusCheck(TIM15))
 	{
-		CONTROL_HighPriorityProcess();
+		CONTROL_UHighPriorityProcess();
 
 		TIM_StatusClear(TIM15);
+	}
+}
+//-----------------------------------------
+
+void TIM6_IRQHandler()
+{
+	if(TIM_StatusCheck(TIM6))
+	{
+		if(++CONTROL_I_TimeCounter > (Int16U)((float)DataTable[REG_I_T_CURRENT] / (float)TIMER6_uS))
+			CONTROL_IHighPriorityProcess(false, false);
+		else
+			CONTROL_IHighPriorityProcess(true, false);
+		TIM_StatusClear(TIM6);
 	}
 }
 //-----------------------------------------

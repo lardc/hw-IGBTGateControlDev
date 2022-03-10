@@ -17,13 +17,16 @@ int main()
 	// Настройка UART
 	INITCFG_ConfigUART();
 	
+	// Настройка SPI внешнего ЦАП
+	INITCFG_ConfigSPI();
+
 	// Настройка системного счетчика
 	INITCFG_ConfigTimer7();
 	
-	// Настройка таймера для АЦП
+	// Настройка таймера для Регулятора
 	INITCFG_ConfigTimer15();
 
-	// Настройка таймера для ЦАП
+	// Настройка таймера для АЦП тока затвора
 	INITCFG_ConfigTimer6();
 
 	// Настройка DAC

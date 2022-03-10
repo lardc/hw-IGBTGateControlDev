@@ -19,7 +19,7 @@
 
 // Определения для выходных портов
 GPIO_PortPinSettingMacro GPIO_EXT_DAC_CS		= {GPIOA, Pin_1};
-GPIO_PortPinSettingMacro GPIO_EXT_DAC_LDAC		= {GPIOA, Pin_2};
+GPIO_PortPinSettingMacro GPIO_EXT_DAC_LDAC		= {GPIOB, Pin_12};
 //
 GPIO_PortPinSettingMacro GPIO_LED				= {GPIOB, Pin_7};
 GPIO_PortPinSettingMacro GPIO_SHORT_OUT			= {GPIOB, Pin_6};
@@ -32,5 +32,6 @@ GPIO_PortPinSettingMacro GPIO_I_COMP			= {GPIOA, Pin_15};
 GPIO_PortPinSettingMacro GPIO_ALT_UART1_TX		= {GPIOA, Pin_9};
 GPIO_PortPinSettingMacro GPIO_ALT_UART1_RX		= {GPIOA, Pin_10};
 GPIO_PortPinSettingMacro GPIO_ALT_SPI1_CLK		= {GPIOB, Pin_3};
+GPIO_PortPinSettingMacro GPIO_ALT_SPI1_DAT		= {GPIOA, Pin_7};
 
 #endif // __BOARD_H

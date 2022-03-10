@@ -22,10 +22,11 @@
 #define LED_BLINK_PIN		Pin_7
 // External DAC SPI
 #define EXT_DAC_PORT		GPIOA
+#define EXT_DAC_CLK_PORT	GPIOB
 #define EXT_DAC_CS			Pin_1
 #define EXT_DAC_LDAC		Pin_2
 #define EXT_DAC_DATA		Pin_7
-#define EXT_DAC_CLK			Pin_8
+#define EXT_DAC_CLK			Pin_3
 // Analog set
 #define A_SET_PORT			GPIOA
 #define A_SET_I				Pin_4

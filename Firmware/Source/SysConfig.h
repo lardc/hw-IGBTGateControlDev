@@ -21,7 +21,8 @@
 // Timers
 #define TIMER15_uS						50			// в мкс
 #define TIMER7_uS						1000		// в мкс
-#define TIMER6_uS						10			// в мкс
+#define TIMER6_nS						500			// в нс
+#define TIMER6_uS						(TIMER6_nS / 1000)
 // ----------------------------------------------
 
 // CAN
@@ -29,11 +30,11 @@
 // ----------------------------------------------
 
 // ADC
-#define DMA_ADC_CURRENT_CHANNEL			DMA2_Channel5	// Канал DMA для АЦП тока
-#define DMA_ADC_V_BAT_CHANNEL			DMA1_Channel1	// Канал DMA для АЦП напряжения батареи
+#define DMA_ADC_I_GATE_CHANNEL			DMA1_Channel1	// Канал DMA для АЦП тока затвора (источник I)
 #define ADC1_I_SEN_CHANNEL				1				// АЦП1 номер канала тока (источник V)
 #define ADC1_I_GATE_CHANNEL				4				// АЦП1 номер канала тока (источник I)
 #define ADC3_U_SEN_CHANNEL				1				// АЦП3 номер канала напряжения (источник V)
+#define ADC_DMA_BUFF_SIZE				5				// Количество данных для DMA
 // ----------------------------------------------
 
 // SPI
