@@ -16,7 +16,6 @@
 //
 typedef struct __RegulatorParams
 {
-	float UTarget;
 	float UMeasured;
 	float UFormTable[PULSE_BUFFER_SIZE];
 	float UFormMeasured[PULSE_BUFFER_SIZE];

@@ -236,7 +236,7 @@ void CONTROL_UHighPriorityProcess()
 	if(CONTROL_SubState == SS_Pulse)
 	{
 		if (MEASURE_UParams(&RegulatorParams))
-			REGULATOR_UFormUpdate(&RegulatorParams);
+							REGULATOR_UFormUpdate(&RegulatorParams);
 
 		if(CONTROL_RegulatorCycle(&RegulatorParams))
 		{
@@ -279,7 +279,7 @@ void CONTROL_USetResults(volatile RegulatorParamsStruct* Regulator)
 	float Result = Regulator->UFormMeasured[Regulator->ConstantUFirstPulse];
 	if ((Regulator->ConstantUFirstPulse) != (Regulator->ConstantULastPulse))
 	{
-		for (Int16U i = ++Regulator->ConstantUFirstPulse; i < Regulator->ConstantULastPulse; i++)
+		for (Int16U i = Regulator->ConstantUFirstPulse++; i < Regulator->ConstantULastPulse; i++)
 			Result += Regulator->UFormMeasured[i];
 		Result /= (Regulator->ConstantULastPulse - Regulator->ConstantUFirstPulse);
 		DataTable[REG_U_VGS] = (Int16U)Result;
@@ -336,12 +336,14 @@ void CONTROL_StartPrepare()
 void CONTROL_UStopProcess()
 {
 	TIM_Stop(TIM15);
+	LL_UUSetDAC(0);
 	LL_UShortOut(true);
 }
 //------------------------------------------
 
 void CONTROL_UStartProcess()
 {
+	CONTROL_ResetOutputRegisters();
 	LL_UShortOut(false);
 	TIM_Reset(TIM15);
 	TIM_Start(TIM15);
@@ -350,6 +352,7 @@ void CONTROL_UStartProcess()
 
 void CONTROL_IStartProcess()
 {
+	CONTROL_ResetOutputRegisters();
 	ExDAC_IUCutoff((float)DataTable[REG_I_U_CUTOFF]);
 	ExDAC_IUNegative((float)DataTable[REG_I_U_NEGATIVE]);
 	CONTROL_I_TimeCounter = 0;

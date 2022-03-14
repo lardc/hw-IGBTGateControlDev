@@ -55,7 +55,7 @@
 //
 
 #define CURRENT_TRIG_MIN			1			// [мА]
-#define CURRENT_TRIG_MAX			500			// [мА]
+#define CURRENT_TRIG_MAX			300			// [мА]
 //
 #define T_UCONSTANT_MIN				1			// [мс]
 #define T_UCONSTANT_MAX				20			// [мс]

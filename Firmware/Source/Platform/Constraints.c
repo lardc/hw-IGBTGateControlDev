@@ -58,7 +58,7 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] = {
 		{0, 0, 0},																	// 47
 		{0, 0, 0},																	// 48
 		{0, 0, 0},																	// 49
-		{REGULATOR_KP_MIN, REGULATOR_KP_MAX, 0},									// 50
+		{REGULATOR_KP_MIN, REGULATOR_KP_MAX, 1},									// 50
 		{REGULATOR_KI_MIN, REGULATOR_KI_MAX, 0},									// 51
 		{0, INT16U_MAX, 0},															// 52
 		{0, 0, 0},																	// 53
@@ -163,7 +163,7 @@ const TableItemConstraint VConstraint[DATA_TABLE_WP_START - DATA_TABLE_WR_START]
 		{0, 0, 0},																	// 149
 		{0, INT16U_MAX, 0},															// 150
 		{NO, YES, YES},																// 151
-		{0, 0, 0},																	// 152
+		{0, 1, 0},																	// 152
 		{0, 0, 0},																	// 153
 		{0, 0, 0},																	// 154
 		{0, 0, 0},																	// 155

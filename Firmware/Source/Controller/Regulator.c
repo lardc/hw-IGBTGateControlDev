@@ -37,7 +37,7 @@ bool REGULATOR_Process(volatile RegulatorParamsStruct* Regulator)
 		ValueToDAC = Regulator->RegulatorOutput;
 
 	// Проверка границ диапазона ЦАП
-	Regulator->DACSetpoint = REGULATOR_DACApplyLimits(ValueToDAC, Regulator->DACOffset, Regulator->DACLimitValue);
+	Regulator->DACSetpoint = REGULATOR_DACApplyLimits(CU_UUToDAC(ValueToDAC), Regulator->DACOffset, Regulator->DACLimitValue);
 	LL_UUSetDAC(Regulator->DACSetpoint);
 
 	if(DataTable[REG_REGULATOR_LOGGING] == 1)
@@ -47,6 +47,7 @@ bool REGULATOR_Process(volatile RegulatorParamsStruct* Regulator)
 	{
 		Regulator->DebugMode = false;
 		Regulator->RegulatorPulseCounter = 0;
+		Regulator->ITrigRegulatorPulse = 0;
 		Qi = 0;
 		return true;
 	}
@@ -79,7 +80,7 @@ void REGULATOR_LoggingData(volatile RegulatorParamsStruct* Regulator)
 	{
 		ScopeLogStep = 0;
 
-		CONTROL_UUValues[LocalCounter] = (Int16U)(Regulator->UTarget);
+		CONTROL_UUValues[LocalCounter] = (Int16U)(Regulator->UFormTable[Regulator->RegulatorPulseCounter]);
 		CONTROL_UUMeasValues[LocalCounter] = (Int16U)(Regulator->UMeasured);
 		CONTROL_UIMeasValues[LocalCounter] = (Int16U)(Regulator->IFormMeasured[Regulator->RegulatorPulseCounter]);
 		CONTROL_RegulatorErr[LocalCounter] = (Int16S)(Regulator->RegulatorError);
@@ -88,7 +89,7 @@ void REGULATOR_LoggingData(volatile RegulatorParamsStruct* Regulator)
 
 		CONTROL_Values_Counter = LocalCounter;
 
-		++LocalCounter;
+		LocalCounter++;
 	}
 
 	// Условие обновления глобального счетчика данных
@@ -103,20 +104,22 @@ void REGULATOR_LoggingData(volatile RegulatorParamsStruct* Regulator)
 
 void REGULATOR_UFormConfig(volatile RegulatorParamsStruct* Regulator)
 {
-	Int16U UFrontLastPulse = (Int16U)((float)DataTable[REG_U_T_UFRONT] / PULSE_PERIOD);
+	Int16U UFrontLastPulse = (Int16U)((float)DataTable[REG_U_T_UFRONT] * 1000 / PULSE_PERIOD);
 	for (Int16U i = 0; i < PULSE_BUFFER_SIZE; i++)
-		Regulator->UFormTable[i] = i < UFrontLastPulse ?  (float)((DataTable[REG_U_UMAX] * i) / DataTable[REG_U_T_UFRONT]) : 0;
+		Regulator->UFormTable[i] = i < UFrontLastPulse ?  (float)((DataTable[REG_U_UMAX] * (i+1)) / UFrontLastPulse) : 0;
 }
 //-----------------------------------------------
 
 void REGULATOR_UFormUpdate (volatile RegulatorParamsStruct* Regulator)
 {
+	TIM_Stop(TIM15);
 	Regulator->ConstantUFirstPulse = Regulator->RegulatorPulseCounter;
-	Regulator->ConstantULastPulse = Regulator->RegulatorPulseCounter + (Int16U)((float)DataTable[REG_U_T_UCONSTANT] / PULSE_PERIOD);
+	Regulator->ConstantULastPulse = Regulator->RegulatorPulseCounter + (Int16U)((float)DataTable[REG_U_T_UCONSTANT] * 1000 / PULSE_PERIOD);
 	if (Regulator->ConstantULastPulse > PULSE_BUFFER_SIZE)
 		Regulator->ConstantULastPulse = PULSE_BUFFER_SIZE;
 	for (Int16U i = Regulator->RegulatorPulseCounter; i < PULSE_BUFFER_SIZE; i++)
 		Regulator->UFormTable[i] = i < Regulator->ConstantULastPulse ? Regulator->UFormTable[Regulator->RegulatorPulseCounter] : 0;
+	TIM_Start(TIM15);
 }
 //-----------------------------------------------
 
@@ -125,7 +128,7 @@ void REGULATOR_CashVariables(volatile RegulatorParamsStruct* Regulator)
 	Regulator->Kp = (float)DataTable[REG_REGULATOR_Kp] / 1000;
 	Regulator->Ki = (float)DataTable[REG_REGULATOR_Ki] / 1000;
 	Regulator->KiTune = (float)DataTable[REG_REGULATOR_TF_Ki] / 1e6;
-	Regulator->DebugMode = false;
+	Regulator->DebugMode = (bool)DataTable[REG_REGULATOR_DEBUG];
 	Regulator->DACOffset = DataTable[REG_DAC_OFFSET];
 	Regulator->DACLimitValue = (DAC_MAX_VAL > DataTable[REG_DAC_OUTPUT_LIMIT_VALUE]) ? \
 			DataTable[REG_DAC_OUTPUT_LIMIT_VALUE] : DAC_MAX_VAL;

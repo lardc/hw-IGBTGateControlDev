@@ -15,7 +15,7 @@ void LL_ToggleBoardLED()
 
 void LL_UShortOut(bool State)
 {
-	GPIO_SetState(GPIO_SHORT_OUT, State);
+	GPIO_SetState(GPIO_SHORT_OUT, !State);
 }
 //-----------------------------
 

@@ -26,7 +26,7 @@ void DBGACT_UUSet()
 
 void DBGACT_UShortOut()
 {
-	DataTable[REG_DBG] == 1 ? LL_UShortOut(false) : LL_UShortOut(true);
+	DataTable[REG_DBG] == 0 ? LL_UShortOut(false) : LL_UShortOut(true);
 }
 //-----------------------------
 
