@@ -13,6 +13,7 @@
 #include "Measurement.h"
 #include "math.h"
 #include "ExternalDAC.h"
+#include "Delay.h"
 
 // Types
 //
@@ -25,6 +26,7 @@ volatile DeviceSubState CONTROL_SubState = SS_None;
 static Boolean CycleActive = false;
 //
 volatile Int64U CONTROL_TimeCounter = 0;
+volatile Int16U CONTROL_TimerMaxCounter = 0;
 volatile Int64U CONTROL_I_TimeCounter = 0;
 volatile Int64U CONTROL_I_Start_Counter = 0;
 volatile Int64U CONTROL_I_Stop_Counter = 0;
@@ -107,6 +109,15 @@ void CONTROL_ResetOutputRegisters()
 
 	DEVPROFILE_ResetScopes(0);
 	DEVPROFILE_ResetEPReadState();
+}
+//------------------------------------------
+
+void CONTROL_ResetIArray()
+{
+	for (Int16U i = 0; i < I_VALUES_x_SIZE; i++)
+	{
+		CONTROL_IIGateValues[i] = 0;
+	}
 }
 //------------------------------------------
 
@@ -222,7 +233,7 @@ void CONTROL_LogicProcess()
 			break;
 
 		case SS_WaitAfterIPulse:
-			CONTROL_ISetResults(&RegulatorParams);
+			CONTROL_ISetResults();
 			break;
 
 		default:
@@ -247,23 +258,21 @@ void CONTROL_UHighPriorityProcess()
 }
 //-----------------------------------------------
 
-void CONTROL_IHighPriorityProcess(bool IsInProgress, bool IsGateCurrent)
+void CONTROL_IHighPriorityProcess()
 {
 	if(CONTROL_SubState == SS_Pulse)
 	{
-		if (IsInProgress)
-		{
-			if (IsGateCurrent) CONTROL_I_Start_Counter = CONTROL_I_Values_Counter;
-			CONTROL_IIGateValues[CONTROL_I_Values_Counter] = MEASURE_DMAExtractIGate();
-			CONTROL_I_Values_Counter++;
-		}
-		else
-		{
-			TIM_Stop(TIM6);
-			TIM_StatusClear(TIM6);
-			if (IsGateCurrent) CONTROL_I_Stop_Counter = CONTROL_I_Values_Counter;
-			CONTROL_SetDeviceState(DS_InProcess, SS_WaitAfterIPulse);
-		}
+		TIM_Stop(TIM4);
+		LL_IStart(true);
+		LL_IISetDAC(0);
+		TIM_Stop(TIM6);
+		TIM_Reset(TIM6);
+		ADC_SamplingStop(ADC1);
+		DMA_TransferCompleteReset(DMA1, DMA_ISR_TCIF1);
+		TIM_StatusClear(TIM4);
+		//ExDAC_IUCutoff(0);
+		//ExDAC_IUNegative(0);
+		CONTROL_SetDeviceState(DS_InProcess, SS_WaitAfterIPulse);
 	}
 }
 //-----------------------------------------------
@@ -295,13 +304,20 @@ void CONTROL_USetResults(volatile RegulatorParamsStruct* Regulator)
 
 void CONTROL_ISetResults()
 {
+	CONTROL_IProcessing();
 	if (CONTROL_I_Start_Counter != CONTROL_I_Stop_Counter)
 	{
 		Int16U I_Counter = CONTROL_I_Stop_Counter - CONTROL_I_Start_Counter;
 		float Result;
 		for (Int16U i = CONTROL_I_Start_Counter; i < CONTROL_I_Stop_Counter; i++)
-				Result += CONTROL_IIGateValues[i];
+				Result += MEASURE_ADC_IGateRaw[i];
 		Result /= I_Counter;
+
+		for (Int16U i = 0; i < I_VALUES_x_SIZE; i++)
+		{
+			CONTROL_IIGateValues[i] = CU_IADCIToX(MEASURE_ADC_IGateRaw[i]);
+		}
+		Result = CU_IADCIToX((Int16U)Result);
 
 		float Time = I_Counter * TIMER6_uS;
 		float Qgate = Result * Time;
@@ -318,10 +334,25 @@ void CONTROL_ISetResults()
 		DataTable[REG_I_QG] = 0;
 	}
 
-	CONTROL_I_Values_Counter = 0;
 	CONTROL_I_Start_Counter = 0;
 	CONTROL_I_Stop_Counter = 0;
 	CONTROL_SetDeviceState(DS_Ready, SS_None);
+}
+//-----------------------------------------------
+
+void CONTROL_IProcessing()
+{
+	CONTROL_I_Start_Counter = 0;
+	CONTROL_I_Stop_Counter = 0;
+
+	for (Int16U i = 0; i < I_VALUES_x_SIZE; i++)
+	{
+		if ((CU_IADCIToX(MEASURE_ADC_IGateRaw[i]) > (0.3 * DataTable[REG_I_I_SET])) && (CONTROL_I_Start_Counter == 0))
+				CONTROL_I_Start_Counter = i;
+		if ((CU_IADCIToX(MEASURE_ADC_IGateRaw[I_VALUES_x_SIZE - i]) > (0.3 * DataTable[REG_I_I_SET])) && (CONTROL_I_Stop_Counter == 0))
+				CONTROL_I_Stop_Counter = I_VALUES_x_SIZE - i;
+	}
+	CONTROL_I_Values_Counter = CONTROL_I_Stop_Counter;
 }
 //-----------------------------------------------
 
@@ -353,12 +384,25 @@ void CONTROL_UStartProcess()
 void CONTROL_IStartProcess()
 {
 	CONTROL_ResetOutputRegisters();
+	CONTROL_ResetIArray();
+	//ADC_SwitchToHighSpeed();
+
+
+	CONTROL_I_Values_Counter = 0;
+	CONTROL_TimerMaxCounter = (Int16U)((float)DataTable[REG_I_T_CURRENT] / (float)TIMER4_uS);
 	ExDAC_IUCutoff((float)DataTable[REG_I_U_CUTOFF]);
 	ExDAC_IUNegative((float)DataTable[REG_I_U_NEGATIVE]);
+	LL_IISetDAC(CU_IIToDAC((float)DataTable[REG_I_I_SET]));
+	DELAY_US(5);
 	CONTROL_I_TimeCounter = 0;
+	TIM_Reset(TIM4);
+	DMA_ChannelReload(DMA_ADC_I_GATE_CHANNEL, I_VALUES_x_SIZE);
+	DMA_ChannelEnable(DMA_ADC_I_GATE_CHANNEL, true);
+	ADC_SamplingStart(ADC1);
 	TIM_Reset(TIM6);
 	TIM_Start(TIM6);
-	LL_IISetDAC(CU_IIToDAC((float)DataTable[REG_I_I_SET]));
+	LL_IStart(false);
+	TIM_Start(TIM4);
 }
 //-----------------------------------------------
 

@@ -47,6 +47,8 @@ void DBGACT_UISen()
 void DBGACT_IISet()
 {
 	LL_IISetDAC(CU_IIToDAC((float)DataTable[REG_DBG]));
+	DELAY_US(20);
+	LL_IISetDAC(0);
 }
 //-----------------------------
 
@@ -71,5 +73,15 @@ void DBGACT_UUCutoffSet()
 void DBGACT_UUNegativeSet()
 {
 	ExDAC_IUNegative(DataTable[REG_DBG]);
+}
+
+void DBGACT_ITestPulse()
+{
+	LL_IISetDAC(CU_IIToDAC((float)DataTable[REG_DBG]));
+	DELAY_US(5);
+	LL_IStart(false);
+	DELAY_US(20);
+	LL_IStart(true);
+	LL_IISetDAC(0);
 }
 //-----------------------------

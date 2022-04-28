@@ -37,6 +37,7 @@ typedef enum __DeviceWarning
 //
 extern volatile DeviceState CONTROL_State;
 extern volatile Int64U CONTROL_TimeCounter;
+extern volatile Int16U CONTROL_TimerMaxCounter;
 extern volatile Int64U CONTROL_I_TimeCounter;
 extern Int64U CONTROL_LEDTimeout;
 extern volatile Int16U CONTROL_Values_Counter;
@@ -48,7 +49,7 @@ extern volatile Int16U CONTROL_RegulatorOutput[];
 extern volatile Int16U CONTROL_RegulatorErr[];
 extern volatile Int16U CONTROL_DACRawData[];
 extern volatile Int16U CONTROL_UIMeasValues[];
-extern volatile Int16U CONTROL_IIGateValues[];
+extern volatile Int16U CONTROL_IIGateValues[I_VALUES_x_SIZE];
 //
 extern volatile RegulatorParamsStruct RegulatorParams;
 
@@ -61,7 +62,7 @@ void CONTROL_SetDeviceState(DeviceState NewState, DeviceSubState NewSubState);
 void CONTROL_SetDeviceWarning(DeviceWarning NewWarning);
 void CONTROL_DelayMs(uint32_t Delay);
 void CONTROL_UHighPriorityProcess();
-void CONTROL_IHighPriorityProcess(bool IsInProgress, bool IsGateCurrent);
+void CONTROL_IHighPriorityProcess();
 void CONTROL_ExternalInterruptProcess();
 void CONTROL_UStartProcess();
 void CONTROL_IStartProcess();
@@ -69,5 +70,6 @@ void CONTROL_USetResults(volatile RegulatorParamsStruct* Regulator);
 void CONTROL_ISetResults();
 void CONTROL_UStartProcess();
 void CONTROL_UStopProcess();
+void CONTROL_IProcessing();
 
 #endif // __CONTROLLER_H

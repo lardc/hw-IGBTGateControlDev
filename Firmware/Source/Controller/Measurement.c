@@ -6,7 +6,7 @@
 #include "Global.h"
 
 // Variables
-Int16U MEASURE_ADC_IGateRaw[ADC_DMA_BUFF_SIZE];
+volatile Int16U MEASURE_ADC_IGateRaw[I_VALUES_x_SIZE];
 
 // Functions
 //
@@ -36,9 +36,16 @@ Boolean MEASURE_UParams(volatile RegulatorParamsStruct* Regulator)
 {
 	float U = CU_UADCUToX(MEASURE_UUSen());
 	float I = CU_UADCIToX(MEASURE_UISen());
+
+	if(Regulator->RegulatorPulseCounter == 0)
+	{
+		U = 0;
+		I = 0;
+	}
 	Regulator->UMeasured = U;
 	Regulator->UFormMeasured[Regulator->RegulatorPulseCounter] = U;
 	Regulator->IFormMeasured[Regulator->RegulatorPulseCounter] = I;
+
 	// проверка на достижение током порогового значения
 	if ((I >= (float)DataTable[REG_U_I_TRIG]) && (Regulator->ITrigRegulatorPulse == 0))
 	{
@@ -51,15 +58,15 @@ Boolean MEASURE_UParams(volatile RegulatorParamsStruct* Regulator)
 
 void MEASURE_DMAIGateBufferClear()
 {
-	for(int i = 0; i < ADC_DMA_BUFF_SIZE; i++)
+	for(int i = 0; i < I_VALUES_x_SIZE; i++)
 		MEASURE_ADC_IGateRaw[i] = 0;
 }
 //-----------------------------------------------
 
-Int16U MEASURE_DMAExtractIGate()
+/*Int16U MEASURE_DMAExtractIGate()
 {
-	return MEASURE_Average(&MEASURE_ADC_IGateRaw[1], ADC_DMA_BUFF_SIZE - 1);
-}
+	return MEASURE_Average(&MEASURE_ADC_IGateRaw[1], I_VALUES_x_SIZE - 1);
+}*/
 //-----------------------------------------------
 
 Int16U MEASURE_Average(Int16U* InputArray, Int16U ArraySize)

@@ -34,6 +34,7 @@ bool LL_ICompState()
 void LL_IISetDAC(Int16U Data)
 {
 	DAC_SetValueCh1(DAC1, Data);
+	//DAC_SetValueCh2(DAC1, Data);
 }
 //-----------------------------
 

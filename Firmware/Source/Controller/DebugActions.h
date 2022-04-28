@@ -17,5 +17,6 @@ void DBGACT_IStart();
 void DBGACT_IIGate();
 void DBGACT_UUCutoffSet();
 void DBGACT_UUNegativeSet();
+void DBGACT_ITestPulse();
 
 #endif //__DEBUGACTIONS_H

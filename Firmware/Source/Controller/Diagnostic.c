@@ -95,6 +95,15 @@ bool DIAG_HandleDiagnosticAction(uint16_t ActionID, uint16_t *pUserError)
 			}
 			break;
 
+		case ACT_DBG_I_TEST_PULSE:
+			{
+				if(CONTROL_State == DS_None)
+					DBGACT_ITestPulse();
+				else
+					*pUserError = ERR_OPERATION_BLOCKED;
+			}
+			break;
+
 		default:
 			return false;
 	}
